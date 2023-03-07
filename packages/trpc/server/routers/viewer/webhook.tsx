@@ -244,14 +244,14 @@ export const webhookRouter = router({
           {
             email: "jdoe@example.com",
             name: "John Doe",
-            timeZone: "Europe/London",
+            timeZone: "America/Los_Angeles",
             language,
           },
         ],
         organizer: {
-          name: "Cal",
-          email: "no-reply@cal.com",
-          timeZone: "Europe/London",
+          name: "Circuit ID",
+          email: "no-reply@circuitid.com",
+          timeZone: "America/Los_Angeles",
           language,
         },
       };

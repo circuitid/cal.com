@@ -20,6 +20,7 @@ import ImpersonationProvider from "@calcom/features/ee/impersonation/lib/Imperso
 import jackson from "@calcom/features/ee/sso/lib/jackson";
 import { hostedCal, isSAMLLoginEnabled, clientSecretVerifier } from "@calcom/features/ee/sso/lib/saml";
 import { ErrorCode, isPasswordValid, verifyPassword } from "@calcom/lib/auth";
+import { hashPassword } from "@calcom/lib/auth";
 import { APP_NAME, IS_TEAM_BILLING_ENABLED, WEBAPP_URL, WEBSITE_URL } from "@calcom/lib/constants";
 import { symmetricDecrypt } from "@calcom/lib/crypto";
 import { defaultCookies } from "@calcom/lib/default-cookies";
@@ -64,6 +65,10 @@ const providers: Provider[] = [
       email: { label: "Email Address", type: "email", placeholder: "john.doe@example.com" },
       password: { label: "Password", type: "password", placeholder: "Your super secure password" },
       totpCode: { label: "Two-factor Code", type: "input", placeholder: "Code from authenticator app" },
+      jwtLogin: { label: "JWT Login", type: "input", placeholder: "JTW login code" },
+      name: { label: "User's Name", type: "input", placeholder: "Name" },
+      _id: { label: "User's ID", type: "input", placeholder: "ID" },
+      timezone: { label: "User's Timezone", type: "input", placeholder: "Timezone" },
     },
     async authorize(credentials) {
       if (!credentials) {
@@ -71,10 +76,14 @@ const providers: Provider[] = [
         throw new Error(ErrorCode.InternalServerError);
       }
 
-      const user = await prisma.user.findUnique({
-        where: {
-          email: credentials.email.toLowerCase(),
-        },
+      const search = credentials.jwtLogin
+        ? { username: credentials._id }
+        : {
+            email: credentials.email.toLowerCase(),
+          };
+
+      let user = await prisma.user.findUnique({
+        where: search,
         select: {
           role: true,
           id: true,
@@ -96,50 +105,101 @@ const providers: Provider[] = [
 
       // Don't leak information about it being username or password that is invalid
       if (!user) {
-        throw new Error(ErrorCode.IncorrectUsernamePassword);
+        if (!credentials.jwtLogin || !credentials._id || !credentials.email || !credentials.name)
+          throw new Error(ErrorCode.IncorrectUsernamePassword);
+        try {
+          user = await prisma.user.create({
+            data: {
+              username: credentials._id,
+              email: credentials.email,
+              password: await hashPassword(Math.random().toString(36).slice(-16)),
+              role: "USER",
+              name: credentials.name,
+              emailVerified: new Date(),
+              locale: "en",
+              timeZone: credentials.timezone ? credentials.timezone.trim() : undefined,
+              identityProvider: IdentityProvider.CAL,
+            },
+          });
+
+          if (!user) throw new Error(ErrorCode.IncorrectUsernamePassword);
+        } catch (e) {
+          throw new Error(ErrorCode.InternalServerError);
+        }
+      } else if (credentials.jwtLogin) {
+        const update = {} as {
+          email: string;
+          username: string;
+          name: string;
+        };
+
+        console.log("credentials", credentials);
+        if (!user.email || credentials.email.trim().toLowerCase() !== user.email.trim().toLowerCase())
+          update.email = credentials.email.trim();
+
+        if (!user.name || credentials.name.trim() !== user.name.trim()) update.name = credentials.name.trim();
+
+        if (!user.username || credentials._id.trim() !== user.username.trim())
+          update.username = credentials._id.trim();
+
+        if (!user.avatar || credentials.avatar.trim() !== user.avatar.trim())
+          update.avatar = credentials.avatar.trim();
+
+        if (!user.timeZone || credentials.timezone.trim() !== user.timeZone.trim())
+          update.timeZone = credentials.timezone.trim();
+
+        if (update.email || update.username || update.name || update.timeZone || update.avatar)
+          await prisma.user.update({
+            where: {
+              id: user.id,
+            },
+            data: update,
+          });
       }
 
-      if (user.identityProvider !== IdentityProvider.CAL && !credentials.totpCode) {
-        throw new Error(ErrorCode.ThirdPartyIdentityProviderEnabled);
-      }
+      if (!credentials.jwtLogin) {
+        if (user.identityProvider !== IdentityProvider.CAL && !credentials.totpCode) {
+          throw new Error(ErrorCode.ThirdPartyIdentityProviderEnabled);
+        }
 
-      if (!user.password && user.identityProvider !== IdentityProvider.CAL && !credentials.totpCode) {
-        throw new Error(ErrorCode.IncorrectUsernamePassword);
-      }
-
-      if (user.password) {
-        const isCorrectPassword = await verifyPassword(credentials.password, user.password);
-        if (!isCorrectPassword) {
+        if (!user.password && user.identityProvider !== IdentityProvider.CAL && !credentials.totpCode) {
           throw new Error(ErrorCode.IncorrectUsernamePassword);
         }
-      }
 
-      if (user.twoFactorEnabled) {
-        if (!credentials.totpCode) {
-          throw new Error(ErrorCode.SecondFactorRequired);
+        if (user.password) {
+          const isCorrectPassword = await verifyPassword(credentials.password, user.password);
+          if (!isCorrectPassword) {
+            throw new Error(ErrorCode.IncorrectUsernamePassword);
+          }
         }
 
-        if (!user.twoFactorSecret) {
-          console.error(`Two factor is enabled for user ${user.id} but they have no secret`);
-          throw new Error(ErrorCode.InternalServerError);
-        }
+        if (user.twoFactorEnabled) {
+          if (!credentials.totpCode) {
+            throw new Error(ErrorCode.SecondFactorRequired);
+          }
 
-        if (!process.env.CALENDSO_ENCRYPTION_KEY) {
-          console.error(`"Missing encryption key; cannot proceed with two factor login."`);
-          throw new Error(ErrorCode.InternalServerError);
-        }
+          if (!user.twoFactorSecret) {
+            console.error(`Two factor is enabled for user ${user.id} but they have no secret`);
+            throw new Error(ErrorCode.InternalServerError);
+          }
 
-        const secret = symmetricDecrypt(user.twoFactorSecret, process.env.CALENDSO_ENCRYPTION_KEY);
-        if (secret.length !== 32) {
-          console.error(
-            `Two factor secret decryption failed. Expected key with length 32 but got ${secret.length}`
-          );
-          throw new Error(ErrorCode.InternalServerError);
-        }
+          if (!process.env.CALENDSO_ENCRYPTION_KEY) {
+            console.error(`"Missing encryption key; cannot proceed with two factor login."`);
+            throw new Error(ErrorCode.InternalServerError);
+          }
 
-        const isValidToken = authenticator.check(credentials.totpCode, secret);
-        if (!isValidToken) {
-          throw new Error(ErrorCode.IncorrectTwoFactorCode);
+          const secret = symmetricDecrypt(user.twoFactorSecret, process.env.CALENDSO_ENCRYPTION_KEY);
+          if (secret.length !== 32) {
+            console.error(
+              `Two factor secret decryption failed. Expected key with length 32 but got ${secret.length}`
+            );
+            throw new Error(ErrorCode.InternalServerError);
+          }
+
+          const isValidToken = authenticator.check(credentials.totpCode, secret);
+          if (!isValidToken) {
+            throw new Error(ErrorCode.IncorrectTwoFactorCode);
+          }
         }
       }
 

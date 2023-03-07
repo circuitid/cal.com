@@ -5,7 +5,6 @@ import { useEffect } from "react";
 
 import { WEBSITE_URL } from "@calcom/lib/constants";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
-import { Button } from "@calcom/ui";
 import { FiCheck } from "@calcom/ui/components/icon";
 
 import type { inferSSRProps } from "@lib/types/inferSSRProps";
@@ -43,9 +42,6 @@ export default function Logout(props: Props) {
           </div>
         </div>
       </div>
-      <Button href="/auth/login" passHref className="flex w-full justify-center">
-        {t("go_back_login")}
-      </Button>
     </AuthContainer>
   );
 }
