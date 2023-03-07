@@ -227,7 +227,11 @@ const Component = ({
           )}
         </span>
 
-        <h4 className="mt-8 mb-2 font-semibold text-gray-900 ">{t("learn_more")}</h4>
+        {(docs ||
+          (website && !website?.includes("cal.com")) ||
+          (email && email != "help@cal.com") ||
+          tos ||
+          privacy) && <h4 className="mt-8 mb-2 font-semibold text-gray-900 ">{t("learn_more")}</h4>}
         <ul className="prose-sm -ml-1 -mr-1 leading-5">
           {docs && (
             <li>
@@ -241,7 +245,7 @@ const Component = ({
               </a>
             </li>
           )}
-          {website && (
+          {!website?.includes("cal.com") && website && (
             <li>
               <a
                 target="_blank"
@@ -253,7 +257,7 @@ const Component = ({
               </a>
             </li>
           )}
-          {email && (
+          {email != "help@cal.com" && email && (
             <li>
               <a
                 target="_blank"

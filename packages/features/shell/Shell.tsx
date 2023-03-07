@@ -15,11 +15,10 @@ import HelpMenuItem from "@calcom/features/ee/support/components/HelpMenuItem";
 import { TeamsUpgradeBanner } from "@calcom/features/ee/teams/components";
 import { KBarContent, KBarRoot, KBarTrigger } from "@calcom/features/kbar/Kbar";
 import TimezoneChangeDialog from "@calcom/features/settings/TimezoneChangeDialog";
-import { Tips } from "@calcom/features/tips";
 import AdminPasswordBanner from "@calcom/features/users/components/AdminPasswordBanner";
 import CustomBranding from "@calcom/lib/CustomBranding";
 import classNames from "@calcom/lib/classNames";
-import { APP_NAME, DESKTOP_APP_LINK, JOIN_SLACK, ROADMAP, WEBAPP_URL } from "@calcom/lib/constants";
+import { APP_NAME, WEBAPP_URL } from "@calcom/lib/constants";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import useTheme from "@calcom/lib/hooks/useTheme";
 import { trpc } from "@calcom/trpc/react";
@@ -46,10 +45,6 @@ import {
   FiMoon,
   FiExternalLink,
   FiLink,
-  FiSlack,
-  FiMap,
-  FiHelpCircle,
-  FiDownload,
   FiLogOut,
   FiCalendar,
   FiClock,
@@ -298,13 +293,6 @@ function UserDropdown({ small }: { small?: boolean }) {
                   <span className="mb-1 block truncate font-medium leading-none text-gray-900">
                     {user.name || "Nameless User"}
                   </span>
-                  <span className="block truncate font-normal leading-none text-gray-600">
-                    {user.username
-                      ? process.env.NEXT_PUBLIC_WEBSITE_URL === "https://cal.com"
-                        ? `cal.com/${user.username}`
-                        : `/${user.username}`
-                      : "No public page"}
-                  </span>
                 </span>
                 <FiMoreVertical
                   className="h-4 w-4 flex-shrink-0 text-gray-400 group-hover:text-gray-500 ltr:mr-2 rtl:ml-2 rtl:mr-4"
@@ -317,112 +305,77 @@ function UserDropdown({ small }: { small?: boolean }) {
       </div>
 
       <DropdownMenuPortal>
-        <FreshChatProvider>
-          <DropdownMenuContent
-            onInteractOutside={() => {
-              setMenuOpen(false);
-              setHelpOpen(false);
-            }}
-            className="overflow-hidden rounded-md">
-            {helpOpen ? (
-              <HelpMenuItem onHelpItemSelect={() => onHelpItemSelect()} />
-            ) : (
-              <>
-                <DropdownMenuItem>
-                  <DropdownItem
-                    type="button"
-                    StartIcon={(props) => (
-                      <FiMoon
-                        className={classNames(
-                          user.away
-                            ? "text-purple-500 group-hover:text-purple-700"
-                            : "text-gray-500 group-hover:text-gray-700",
-                          props.className
-                        )}
-                        aria-hidden="true"
-                      />
-                    )}
-                    onClick={() => {
-                      mutation.mutate({ away: !user?.away });
-                      utils.viewer.me.invalidate();
-                    }}>
-                    {user.away ? t("set_as_free") : t("set_as_away")}
-                  </DropdownItem>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                {user.username && (
-                  <>
-                    <DropdownMenuItem>
-                      <DropdownItem
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}/${user.username}`}
-                        StartIcon={FiExternalLink}>
-                        {t("view_public_page")}
-                      </DropdownItem>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <DropdownItem
-                        type="button"
-                        StartIcon={FiLink}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          navigator.clipboard.writeText(
-                            `${process.env.NEXT_PUBLIC_WEBSITE_URL}/${user.username}`
-                          );
-                          showToast(t("link_copied"), "success");
-                        }}>
-                        {t("copy_public_page_link")}
-                      </DropdownItem>
-                    </DropdownMenuItem>
-                  </>
-                )}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <DropdownItem
-                    StartIcon={(props) => <FiSlack strokeWidth={1.5} {...props} />}
-                    target="_blank"
-                    rel="noreferrer"
-                    href={JOIN_SLACK}>
-                    {t("join_our_slack")}
-                  </DropdownItem>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <DropdownItem StartIcon={FiMap} target="_blank" href={ROADMAP}>
-                    {t("visit_roadmap")}
-                  </DropdownItem>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <DropdownItem
-                    type="button"
-                    StartIcon={(props) => <FiHelpCircle aria-hidden="true" {...props} />}
-                    onClick={() => setHelpOpen(true)}>
-                    {t("help")}
-                  </DropdownItem>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="desktop-hidden hidden lg:flex">
-                  <DropdownItem
-                    StartIcon={FiDownload}
-                    target="_blank"
-                    rel="noreferrer"
-                    href={DESKTOP_APP_LINK}>
-                    {t("download_desktop_app")}
-                  </DropdownItem>
-                </DropdownMenuItem>
-
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <DropdownItem
-                    type="button"
-                    StartIcon={(props) => <FiLogOut aria-hidden="true" {...props} />}
-                    onClick={() => signOut({ callbackUrl: "/auth/logout" })}>
-                    {t("sign_out")}
-                  </DropdownItem>
-                </DropdownMenuItem>
-              </>
-            )}
-          </DropdownMenuContent>
-        </FreshChatProvider>
+        <DropdownMenuContent
+          onInteractOutside={() => {
+            setMenuOpen(false);
+            setHelpOpen(false);
+          }}
+          className="overflow-hidden rounded-md">
+          {helpOpen ? (
+            <HelpMenuItem onHelpItemSelect={() => onHelpItemSelect()} />
+          ) : (
+            <>
+              <DropdownMenuItem>
+                <DropdownItem
+                  type="button"
+                  StartIcon={(props) => (
+                    <FiMoon
+                      className={classNames(
+                        user.away
+                          ? "text-purple-500 group-hover:text-purple-700"
+                          : "text-gray-500 group-hover:text-gray-700",
+                        props.className
+                      )}
+                      aria-hidden="true"
+                    />
+                  )}
+                  onClick={() => {
+                    mutation.mutate({ away: !user?.away });
+                    utils.viewer.me.invalidate();
+                  }}>
+                  {user.away ? t("set_as_free") : t("set_as_away")}
+                </DropdownItem>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              {user.username && (
+                <>
+                  <DropdownMenuItem>
+                    <DropdownItem
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={`${process.env.NEXT_PUBLIC_WEBSITE_URL}/${user.username}`}
+                      StartIcon={FiExternalLink}>
+                      {t("view_public_page")}
+                    </DropdownItem>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <DropdownItem
+                      type="button"
+                      StartIcon={FiLink}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        navigator.clipboard.writeText(
+                          `${process.env.NEXT_PUBLIC_WEBSITE_URL}/${user.username}`
+                        );
+                        showToast(t("link_copied"), "success");
+                      }}>
+                      {t("copy_public_page_link")}
+                    </DropdownItem>
+                  </DropdownMenuItem>
+                </>
+              )}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <DropdownItem
+                  type="button"
+                  StartIcon={(props) => <FiLogOut aria-hidden="true" {...props} />}
+                  onClick={() => signOut({ callbackUrl: "/auth/logout" })}>
+                  {t("sign_out")}
+                </DropdownItem>
+              </DropdownMenuItem>
+            </>
+          )}
+        </DropdownMenuContent>
       </DropdownMenuPortal>
     </Dropdown>
   );
@@ -765,7 +718,6 @@ function SideBar() {
         </div>
 
         <div>
-          <Tips />
           <div data-testid="user-dropdown-trigger">
             <span className="hidden lg:inline">
               <UserDropdown />
