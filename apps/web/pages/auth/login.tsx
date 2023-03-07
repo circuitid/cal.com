@@ -4,7 +4,7 @@ import type { GetServerSidePropsContext } from "next";
 import { getCsrfToken, signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { FaGoogle } from "react-icons/fa";
 
@@ -18,6 +18,7 @@ import { collectPageParameters, telemetryEventTypes, useTelemetry } from "@calco
 import prisma from "@calcom/prisma";
 import { Alert, Button, EmailField, PasswordField } from "@calcom/ui";
 import { FiArrowLeft } from "@calcom/ui/components/icon";
+import { FiInfo } from "@calcom/ui/components/icon";
 
 import type { inferSSRProps } from "@lib/types/inferSSRProps";
 import type { WithNonceProps } from "@lib/withNonce";
@@ -44,6 +45,7 @@ export default function Login({
   samlTenantID,
   samlProductID,
   totpEmail,
+  jwtPayload,
 }: inferSSRProps<typeof _getServerSideProps> & WithNonceProps) {
   const { t } = useLocale();
   const router = useRouter();
@@ -51,6 +53,7 @@ export default function Login({
 
   const { register, formState } = methods;
   const [twoFactorRequired, setTwoFactorRequired] = useState(!!totpEmail || false);
+  //const [jwtPayload, setjwtPayload] = useState<LoginValues | null>(jwtPayload);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const errorMessages: { [key: string]: string } = {
@@ -105,7 +108,7 @@ export default function Login({
     </Button>
   );
 
-  const onSubmit = async (values: LoginValues) => {
+  const onSubmit = useCallback(async (values: LoginValues) => {
     setErrorMessage(null);
     telemetry.event(telemetryEventTypes.login, collectPageParameters());
     const res = await signIn<"credentials">("credentials", {
@@ -113,6 +116,7 @@ export default function Login({
       callbackUrl,
       redirect: false,
     });
+    console.log("res", res);
     if (!res) setErrorMessage(errorMessages[ErrorCode.InternalServerError]);
     // we're logged in! let's do a hard refresh to the desired url
     else if (!res.error) router.push(callbackUrl);
@@ -120,100 +124,143 @@ export default function Login({
     else if (res.error === ErrorCode.SecondFactorRequired) setTwoFactorRequired(true);
     // fallback if error not found
     else setErrorMessage(errorMessages[res.error] || t("something_went_wrong"));
-  };
+  });
+
+  useEffect(() => {
+    if (jwtPayload) onSubmit(jwtPayload);
+  }, [jwtPayload]);
 
   return (
     <>
-      <AuthContainer
-        title={t("login")}
-        description={t("login")}
-        showLogo
-        heading={twoFactorRequired ? t("2fa_code") : t("welcome_back")}
-        footerText={
-          twoFactorRequired
-            ? !totpEmail
-              ? TwoFactorFooter
-              : ExternalTotpFooter
-            : process.env.NEXT_PUBLIC_DISABLE_SIGNUP !== "true"
-            ? LoginFooter
-            : null
-        }>
-        <FormProvider {...methods}>
-          <form onSubmit={methods.handleSubmit(onSubmit)} data-testid="login-form">
-            <div>
-              <input defaultValue={csrfToken || undefined} type="hidden" hidden {...register("csrfToken")} />
+      {errorMessage && (
+        <AuthContainer title={t("logged_out")} description={t("youve_been_logged_out")} showLogo>
+          <div className="mb-4">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+              <FiInfo className="h-6 w-6 text-red-500" />
             </div>
-            <div className="space-y-6">
-              <div className={classNames("space-y-6", { hidden: twoFactorRequired })}>
-                <EmailField
-                  id="email"
-                  label={t("email_address")}
-                  defaultValue={totpEmail || (router.query.email as string)}
-                  placeholder="john.doe@example.com"
-                  required
-                  {...register("email")}
-                />
-                <div className="relative">
-                  <div className="absolute -top-[6px]  z-10 ltr:right-0 rtl:left-0">
-                    <Link
-                      href="/auth/forgot-password"
-                      tabIndex={-1}
-                      className="text-sm font-medium text-gray-600">
-                      {t("forgot")}
-                    </Link>
-                  </div>
-                  <PasswordField
-                    id="password"
-                    autoComplete="off"
-                    required={!totpEmail}
-                    className="mb-0"
-                    {...register("password")}
+            <div className="mt-3 text-center sm:mt-5">
+              <h3 className="text-lg font-medium leading-6 text-gray-900" id="modal-title">
+                {t(errorMessage)}
+              </h3>
+              <div className="mt-2">
+                <p className="text-sm text-gray-500">{t("error_during_login")}</p>
+              </div>
+            </div>
+          </div>
+        </AuthContainer>
+      )}
+      {!errorMessage && jwtPayload && (
+        <>
+          <div className="flex min-h-screen flex-col justify-center" style={{ alignItems: "center" }}>
+            <img
+              className="w-auto"
+              style={{ height: "300px", width: "300px" }}
+              alt="Circuit ID"
+              title="Circuit ID"
+              src="/default-animated.gif"
+            />
+          </div>
+        </>
+      )}
+      {!errorMessage && !jwtPayload && (
+        <>
+          <AuthContainer
+            title={t("login")}
+            description={t("login")}
+            showLogo
+            heading={twoFactorRequired ? t("2fa_code") : t("welcome_back")}
+            footerText={
+              twoFactorRequired
+                ? !totpEmail
+                  ? TwoFactorFooter
+                  : ExternalTotpFooter
+                : process.env.NEXT_PUBLIC_DISABLE_SIGNUP !== "true"
+                ? LoginFooter
+                : null
+            }>
+            <FormProvider {...methods}>
+              <form onSubmit={methods.handleSubmit(onSubmit)} data-testid="login-form">
+                <div>
+                  <input
+                    defaultValue={csrfToken || undefined}
+                    type="hidden"
+                    hidden
+                    {...register("csrfToken")}
                   />
                 </div>
-              </div>
+                <div className="space-y-6">
+                  <div className={classNames("space-y-6", { hidden: twoFactorRequired })}>
+                    <EmailField
+                      id="email"
+                      label={t("email_address")}
+                      defaultValue={totpEmail || (router.query.email as string)}
+                      placeholder="john.doe@example.com"
+                      required
+                      {...register("email")}
+                    />
+                    <div className="relative">
+                      <div className="absolute -top-[6px]  z-10 ltr:right-0 rtl:left-0">
+                        <Link
+                          href="/auth/forgot-password"
+                          tabIndex={-1}
+                          className="text-sm font-medium text-gray-600">
+                          {t("forgot")}
+                        </Link>
+                      </div>
+                      <PasswordField
+                        id="password"
+                        autoComplete="off"
+                        required={!totpEmail}
+                        className="mb-0"
+                        {...register("password")}
+                      />
+                    </div>
+                  </div>
 
-              {twoFactorRequired && <TwoFactor center />}
+                  {twoFactorRequired && <TwoFactor center />}
 
-              {errorMessage && <Alert severity="error" title={errorMessage} />}
-              <Button
-                type="submit"
-                color="primary"
-                disabled={formState.isSubmitting}
-                className="w-full justify-center">
-                {twoFactorRequired ? t("submit") : t("sign_in")}
-              </Button>
-            </div>
-          </form>
-          {!twoFactorRequired && (
-            <>
-              {(isGoogleLoginEnabled || isSAMLLoginEnabled) && <hr className="my-8" />}
-              <div className="space-y-3">
-                {isGoogleLoginEnabled && (
+                  {errorMessage && <Alert severity="error" title={errorMessage} />}
                   <Button
-                    color="secondary"
-                    className="w-full justify-center"
-                    data-testid="google"
-                    StartIcon={FaGoogle}
-                    onClick={async (e) => {
-                      e.preventDefault();
-                      await signIn("google");
-                    }}>
-                    {t("signin_with_google")}
+                    type="submit"
+                    color="primary"
+                    disabled={formState.isSubmitting}
+                    className="w-full justify-center">
+                    {twoFactorRequired ? t("submit") : t("sign_in")}
                   </Button>
-                )}
-                {isSAMLLoginEnabled && (
-                  <SAMLLogin
-                    samlTenantID={samlTenantID}
-                    samlProductID={samlProductID}
-                    setErrorMessage={setErrorMessage}
-                  />
-                )}
-              </div>
-            </>
-          )}
-        </FormProvider>
-      </AuthContainer>
-      <AddToHomescreen />
+                </div>
+              </form>
+              {!twoFactorRequired && (
+                <>
+                  {(isGoogleLoginEnabled || isSAMLLoginEnabled) && <hr className="my-8" />}
+                  <div className="space-y-3">
+                    {isGoogleLoginEnabled && (
+                      <Button
+                        color="secondary"
+                        className="w-full justify-center"
+                        data-testid="google"
+                        StartIcon={FaGoogle}
+                        onClick={async (e) => {
+                          e.preventDefault();
+                          await signIn("google");
+                        }}>
+                        {t("signin_with_google")}
+                      </Button>
+                    )}
+                    {isSAMLLoginEnabled && (
+                      <SAMLLogin
+                        samlTenantID={samlTenantID}
+                        samlProductID={samlProductID}
+                        setErrorMessage={setErrorMessage}
+                      />
+                    )}
+                  </div>
+                </>
+              )}
+            </FormProvider>
+          </AuthContainer>
+          <AddToHomescreen />
+        </>
+      )}
     </>
   );
 }
@@ -223,6 +270,7 @@ const _getServerSideProps = async function getServerSideProps(context: GetServer
   const { req } = context;
   const session = await getSession({ req });
   const ssr = await ssrInit(context);
+  const csrfToken = await getCsrfToken(context);
 
   const verifyJwt = (jwt: string) => {
     const secret = new TextEncoder().encode(process.env.CALENDSO_ENCRYPTION_KEY);
@@ -258,6 +306,40 @@ const _getServerSideProps = async function getServerSideProps(context: GetServer
     }
   }
 
+  let jwtPayload = null;
+  if (context.query.jwt) {
+    try {
+      const decryptedJwt = await verifyJwt(context.query.jwt as string);
+
+      if (
+        decryptedJwt.payload &&
+        typeof decryptedJwt.payload === "object" &&
+        decryptedJwt.payload.sub &&
+        decryptedJwt.payload.email &&
+        decryptedJwt.payload.name &&
+        decryptedJwt.payload.timezone
+      )
+        jwtPayload = {
+          _id: decryptedJwt.payload.sub.trim(),
+          email: decryptedJwt.payload.email.toLowerCase(),
+          name: decryptedJwt.payload.name.trim(),
+          timezone: decryptedJwt.payload.timezone.trim(),
+          avatar: decryptedJwt.payload.avatar ? decryptedJwt.payload.avatar.trim() : "",
+          totpCode: "",
+          password: "",
+          csrfToken: csrfToken || "",
+          jwtLogin: true,
+        };
+    } catch (e) {
+      return {
+        redirect: {
+          destination: "/auth/error?error=JWT%20Invalid%20Payload",
+          permanent: false,
+        },
+      };
+    }
+  }
+
   if (session) {
     return {
       redirect: {
@@ -279,7 +361,8 @@ const _getServerSideProps = async function getServerSideProps(context: GetServer
   }
   return {
     props: {
-      csrfToken: await getCsrfToken(context),
+      jwtPayload: jwtPayload,
+      csrfToken: csrfToken,
       trpcState: ssr.dehydrate(),
       isGoogleLoginEnabled: IS_GOOGLE_LOGIN_ENABLED,
       isSAMLLoginEnabled,
