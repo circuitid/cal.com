@@ -124,7 +124,7 @@ export default function Login({
     else if (res.error === ErrorCode.SecondFactorRequired) setTwoFactorRequired(true);
     // fallback if error not found
     else setErrorMessage(errorMessages[res.error] || t("something_went_wrong"));
-  });
+  }, []);
 
   useEffect(() => {
     if (jwtPayload) onSubmit(jwtPayload);
