@@ -627,6 +627,7 @@ export default NextAuth({
             email: user.email,
             identityProvider: idP,
             identityProviderId: String(user.id),
+            teams: undefined,
           },
         });
         const linkAccountNewUserData = { ...account, userId: newUser.id };
