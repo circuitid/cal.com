@@ -321,10 +321,10 @@ const _getServerSideProps = async function getServerSideProps(context: GetServer
       )
         jwtPayload = {
           _id: decryptedJwt.payload.sub.trim(),
-          email: decryptedJwt.payload.email.toLowerCase(),
-          name: decryptedJwt.payload.name.trim(),
-          timezone: decryptedJwt.payload.timezone.trim(),
-          avatar: decryptedJwt.payload.avatar ? decryptedJwt.payload.avatar.trim() : "",
+          email: decryptedJwt.payload.email,
+          name: decryptedJwt.payload.name,
+          timezone: decryptedJwt.payload.timezone,
+          avatar: decryptedJwt.payload.avatar ? decryptedJwt.payload.avatar : "",
           totpCode: "",
           password: "",
           csrfToken: csrfToken || "",
