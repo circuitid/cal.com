@@ -107,9 +107,11 @@ const providers: Provider[] = [
         if (!credentials.jwtLogin || !credentials._id || !credentials.email || !credentials.name)
           throw new Error(ErrorCode.IncorrectUsernamePassword);
         try {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           user = await prisma.user.create({
             data: {
-              teams: {},
+              teams: undefined,
               username: credentials._id,
               email: credentials.email,
               password: await hashPassword(Math.random().toString(36).slice(-16)),
