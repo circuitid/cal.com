@@ -69,6 +69,7 @@ const providers: Provider[] = [
       name: { label: "User's Name", type: "input", placeholder: "Name" },
       _id: { label: "User's ID", type: "input", placeholder: "ID" },
       timezone: { label: "User's Timezone", type: "input", placeholder: "Timezone" },
+      avatar: { label: "User's Avatar", type: "input", placeholder: "Avatar" },
     },
     async authorize(credentials) {
       if (!credentials) {
@@ -134,9 +135,10 @@ const providers: Provider[] = [
           email: string;
           username: string;
           name: string;
+          timeZone: string;
+          avatar: string;
         };
 
-        console.log("credentials", credentials);
         if (!user.email || credentials.email.trim().toLowerCase() !== user.email.trim().toLowerCase())
           update.email = credentials.email.trim();
 
@@ -145,9 +147,13 @@ const providers: Provider[] = [
         if (!user.username || credentials._id.trim() !== user.username.trim())
           update.username = credentials._id.trim();
 
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         if (!user.avatar || credentials.avatar.trim() !== user.avatar.trim())
           update.avatar = credentials.avatar.trim();
 
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         if (!user.timeZone || credentials.timezone.trim() !== user.timeZone.trim())
           update.timeZone = credentials.timezone.trim();
 
