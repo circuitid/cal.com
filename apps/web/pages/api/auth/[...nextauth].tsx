@@ -109,6 +109,7 @@ const providers: Provider[] = [
         try {
           user = await prisma.user.create({
             data: {
+              teams: {},
               username: credentials._id,
               email: credentials.email,
               password: await hashPassword(Math.random().toString(36).slice(-16)),
@@ -627,7 +628,6 @@ export default NextAuth({
             email: user.email,
             identityProvider: idP,
             identityProviderId: String(user.id),
-            teams: undefined,
           },
         });
         const linkAccountNewUserData = { ...account, userId: newUser.id };
