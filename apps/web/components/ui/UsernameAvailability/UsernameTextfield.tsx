@@ -114,6 +114,7 @@ const UsernameTextfield = (props: ICustomUsernameProps) => {
         <div className="relative w-full">
           <TextField
             ref={usernameRef}
+            disabled={true}
             name="username"
             value={inputUsernameValue}
             addOnLeading={
