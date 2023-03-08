@@ -47,6 +47,7 @@ const tabs: VerticalTabItemProps[] = [
     children: [
       //
       { name: "webhooks", href: "/settings/developer/webhooks" },
+      { name: "api_keys", href: "/settings/developer/api-keys" },
       // TODO: Add profile level for embeds
       // { name: "embeds", href: "/v2/settings/developer/embeds" },
     ],
