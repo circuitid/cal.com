@@ -54,13 +54,14 @@ phases:
       - docker pull node:current-bullseye-slim
       - echo Copying required files
       - cp .env.example .env
-      - sed -i 's/TASK_DEFINITION_ARN/$TASK_DEFINITION_ARN/g' taskdef.json
-      - sed -i 's/EXECUTION_ROLE_ARN /$EXECUTION_ROLE_ARN/g' taskdef.json
-      - sed -i 's/TASK_DEFINITION_NAME/$TASK_DEFINITION_NAME/g' taskdef.json
+      - sed -i "s/TASK_DEFINITION_ARN/${TASK_DEFINITION_ARN}/g" taskdef.json
+      - sed -i "s/EXECUTION_ROLE_ARN /${EXECUTION_ROLE_ARN}/g" taskdef.json
+      - sed -i "s/TASK_DEFINITION_NAME/${TASK_DEFINITION_NAME}/g" taskdef.json
       - cat taskdef.json
       - sed -i "/DATABASE_URL/s/.*/DATABASE_URL='${DATABASE_URL}'/" .env
       - sed -i '/NEXT_PUBLIC_WEBAPP_URL/s/.*/NEXT_PUBLIC_WEBAPP_URL="${NEXT_PUBLIC_WEBAPP_URL}"/' .env
       - sed -i '/NEXT_PUBLIC_WEBSITE_URL/s/.*/NEXT_PUBLIC_WEBSITE_URL="${NEXT_PUBLIC_WEBSITE_URL}"/' .env
+      - sed -i '/NEXTAUTH_URL/s/.*/NEXTAUTH_URL="${NEXT_PUBLIC_WEBAPP_URL}"/' .env
       - sed -i '/NEXT_PUBLIC_CONSOLE_URL/s/.*/NEXT_PUBLIC_CONSOLE_URL="${NEXT_PUBLIC_CONSOLE_URL}"/' .env
       - sed -i '/NEXT_PUBLIC_EMBED_LIB_URL/s/.*/NEXT_PUBLIC_EMBED_LIB_URL="${NEXT_PUBLIC_EMBED_LIB_URL}"/' .env
       - sed -i '/CRON_API_KEY/s/.*/CRON_API_KEY="${CRON_API_KEY}"/' .env
