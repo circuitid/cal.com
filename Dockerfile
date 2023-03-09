@@ -6,7 +6,7 @@ ENV DEBCONF_NOWARNINGS="yes"
 ENV NODE_OPTIONS=--max-old-space-size=8192
 #ENV DATABASE_URL=$DATABASE_URL
 WORKDIR /usr/app
-#COPY * ./
+#COPY * ./#
 #COPY package.json yarn.lock turbo.json git-init.sh git-setup.sh .env .eslintrc.js ./
 COPY package.json yarn.lock turbo.json git-init.sh git-setup.sh .eslintrc.js ./
 COPY apps/web ./apps/web
