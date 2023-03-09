@@ -7,10 +7,10 @@ COPY * ./
 RUN ls -lh
 RUN apt-get update
 RUN apt-get -y install git
-#RUN corepack prepare yarn@stable --activate
-#RUN yarn set version stable
+RUN corepack prepare yarn@stable --activate
+RUN yarn set version stable
 RUN yarn config set httpTimeout 1000000000
-RUN yarn global add turbo
+RUN yarn dlx turbo
 RUN corepack prepare yarn@stable --activate
 RUN yarn set version stable
 #RUN turbo prune --scope=@calcom/web --docker
