@@ -1,4 +1,5 @@
 FROM node:18.15.0-bullseye-slim
+RUN printenv
 ARG DATABASE_URL
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS="yes"
