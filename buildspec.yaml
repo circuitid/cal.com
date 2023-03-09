@@ -44,7 +44,7 @@ phases:
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=${COMMIT_HASH:=latest}
   build:
-    on-failure: ABORT
+    on-failure: CONTINUE
     commands:
       - echo Build started on `date`
       - echo Logging into Docker...
@@ -86,8 +86,12 @@ phases:
       - echo -e "\n\n"
       - echo "GOOGLE_API_CREDENTIALS='${GOOGLE_API_CREDENTIALS}'" >> .env
       - cat .env
+      - ls -lh
       - echo Building the Docker image...
-      - docker build -t $REPOSITORY_URI:latest .    
+      - docker build -t $REPOSITORY_URI:latest .   
+      - cat .env
+      - ls -lh
+      - cat yarn
       - echo Docker respository URI is $REPOSITORY_URI
       - echo Docker image tag URI is $IMAGE_TAG
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
