@@ -12,7 +12,7 @@ RUN yarn set version stable
 RUN yarn config set network-timeout 1000000000
 RUN yarn add turbo
 RUN turbo prune --scope=@calcom/web --docker
-RUN yarn
+RUN yarn install --network-timeout 1000000000
 RUN yarn build
 CMD ["yarn", "start"]
 EXPOSE 3000
