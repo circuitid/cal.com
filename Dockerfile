@@ -8,6 +8,7 @@ COPY package.json yarn.lock turbo.json git-init.sh git-setup.sh .env ./
 COPY apps/web ./apps/web
 COPY packages ./packages
 RUN ls -lh
+RUN cat .env
 RUN apt-get update
 RUN apt-get -y install git
 RUN corepack prepare yarn@stable --activate
