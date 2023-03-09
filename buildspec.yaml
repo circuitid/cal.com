@@ -82,10 +82,14 @@ phases:
       - sed -i "s|NEXT_PUBLIC_APP_NAME=.*|NEXT_PUBLIC_APP_NAME='${NEXT_PUBLIC_APP_NAME}'|" .env
       - sed -i "s|NEXT_PUBLIC_SUPPORT_MAIL_ADDRESS=.*|NEXT_PUBLIC_SUPPORT_MAIL_ADDRESS='${NEXT_PUBLIC_SUPPORT_MAIL_ADDRESS}'|" .env
       - sed -i "s|NEXT_PUBLIC_COMPANY_NAME=.*|NEXT_PUBLIC_COMPANY_NAME='${NEXT_PUBLIC_COMPANY_NAME}'|" .env
-      - echo $"\n\nGOOGLE_API_CREDENTIALS='${GOOGLE_API_CREDENTIALS}'" >> .env
+      #- echo "" >> .env
+      #- echo "# Google Credentials" >> .env
+      #- echo "" >> .env
+      - echo -e "\n\n"
+      - echo -e "GOOGLE_API_CREDENTIALS='${GOOGLE_API_CREDENTIALS}'" >> .env
       - cat .env
       - echo Building the Docker image...
-      - docker build -t $REPOSITORY_URI:latest .
+      - docker build -t $REPOSITORY_URI:latest .      
       - echo Docker respository URI is $REPOSITORY_URI
       - echo Docker image tag URI is $IMAGE_TAG
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
