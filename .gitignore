@@ -5,8 +5,8 @@
 !packages/prisma/.env
 
 # aws build
-.appspec.yaml
-.buildspec.yaml
+appspec.yaml
+buildspec.yaml
 taskdef.json
 
 # dependencies
