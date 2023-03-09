@@ -84,7 +84,7 @@ phases:
       - echo -e "\n\n\n"
       - echo "# Google Credentials" >> .env
       - echo -e "\n\n"
-      - echo -e "GOOGLE_API_CREDENTIALS='${GOOGLE_API_CREDENTIALS}'" >> .env
+      - echo "GOOGLE_API_CREDENTIALS='${GOOGLE_API_CREDENTIALS}'" >> .env
       - cat .env
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:latest .      
