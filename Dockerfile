@@ -1,4 +1,4 @@
-FROM node:current-bullseye-slim
+FROM node:18.15.0-bullseye-slim
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS="yes"
 WORKDIR /usr/app
