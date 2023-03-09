@@ -22,6 +22,6 @@ RUN yarn install --network-timeout 1000000000
 RUN printenv
 RUN ls -lha
 RUN cat .env
-RUN yarn build 
+#RUN yarn build 
 CMD ["yarn", "start"]
 EXPOSE 3000
