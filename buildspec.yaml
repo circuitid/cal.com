@@ -117,3 +117,8 @@ artifacts:
     ImageArtifact:
       files:
         - imageDetail.json
+
+cache:
+  paths:
+    - '/root/.yarn-cache/**/*'
+    - 'node_modules/**/*'
