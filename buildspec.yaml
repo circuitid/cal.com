@@ -1,0 +1,58 @@
+version: 0.2
+
+env:
+  secrets-manager:
+    DOCKER_TOKEN: "tokens:dockerToken"
+    DOCKER_ECR: "core:dockerEcr"
+    DOCKER_USER: "core:dockerUser"
+    REPO: "scheduler:repository"
+    BUCKET_PATH: "scheduler:filesBucketPath"
+    TASK_DEFINITION_ARN : "scheduler:TASK_DEFINITION_ARN "
+    EXECUTION_ROLE_ARN : "scheduler:EXECUTION_ROLE_ARN"
+    TASK_DEFINITION_NAME: "scheduler:TASK_DEFINITION_NAME"
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $DOCKER_ECR
+      - REPOSITORY_URI=$REPO
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Logging into Docker...
+      - echo $DOCKER_TOKEN | docker login -u $DOCKER_USER --password-stdin
+      - echo Pulling docker node:current-bullseye-slim image...
+      - docker pull node:current-bullseye-slim
+      - echo Copying required files
+      - sed -i 's/TASK_DEFINITION_ARN/$TASK_DEFINITION_ARN/g' taskdef.json
+      - sed -i 's/EXECUTION_ROLE_ARN /$EXECUTION_ROLE_ARN/g' taskdef.json
+      - sed -i 's/TASK_DEFINITION_NAME/$TASK_DEFINITION_NAME/g' taskdef.json
+      - echo Building the Docker image...
+      - docker build -t $REPOSITORY_URI:latest .
+      - echo Docker respository URI is $REPOSITORY_URI
+      - echo Docker image tag URI is $IMAGE_TAG
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker images...
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo Writing image definitions file...
+      - printf '{"ImageURI":"%s"}' $REPOSITORY_URI:$IMAGE_TAG > imageDetail.json
+artifacts:
+  files:
+    - "image*.json"
+    - "appspec.yaml"
+    - "taskdef.json"
+  secondary-artifacts:
+    DefinitionArtifact:
+      files:
+        - appspec.yaml
+        - taskdef.json
+    ImageArtifact:
+      files:
+        - imageDetail.json

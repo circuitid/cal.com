@@ -4,11 +4,6 @@
 .env
 !packages/prisma/.env
 
-# aws build
-appspec.yaml
-buildspec.yaml
-taskdef.json
-
 # dependencies
 node_modules
 .pnp
