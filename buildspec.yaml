@@ -52,14 +52,9 @@ phases:
       - echo Pulling docker node:18.15.0-bullseye-slim image...
       - docker pull node:18.15.0-bullseye-slim
       - echo Copying required files
-      - cp .env.example .env
-      - sed -i "s|TASK_DEFINITION_ARN|${TASK_DEFINITION_ARN}|g" taskdef.json
-      - sed -i "s|EXECUTION_ROLE_ARN|${EXECUTION_ROLE_ARN}|g" taskdef.json
-      - sed -i "s|TASK_DEFINITION_NAME|${TASK_DEFINITION_NAME}|g" taskdef.json
-      - cat taskdef.json
+      - cp .env.example .env      
       - printenv > .env     
       - ls -lh
-      - export $EMAIL_FROM
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:latest .   
       - cat .env
