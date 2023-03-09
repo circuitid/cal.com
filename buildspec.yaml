@@ -49,8 +49,8 @@ phases:
       - echo Build started on `date`
       - echo Logging into Docker...
       - echo $DOCKER_TOKEN | docker login -u $DOCKER_USER --password-stdin
-      - echo Pulling docker node:18.15.0-bullseye image...
-      - docker pull node:18.15.0-bullseye
+      - echo Pulling docker node:18.15.0-bullseye-slim image...
+      - docker pull node:18.15.0-bullseye-slim
       - echo Copying required files
       - cp .env.example .env
       - sed -i "s|TASK_DEFINITION_ARN|${TASK_DEFINITION_ARN}|g" taskdef.json
@@ -88,7 +88,7 @@ phases:
       - cat .env
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:latest . 
-      - ls /tmp/xfs*
+      - ls -lh
       - cat build.log    
       - echo Docker respository URI is $REPOSITORY_URI
       - echo Docker image tag URI is $IMAGE_TAG
@@ -96,8 +96,8 @@ phases:
   post_build:
     on-failure: ABORT
     commands:
-      - ls /tmp/xfs*
-      - cat build.log  
+      - ls -lh
+      - cat yarn-error.log
       - echo Build completed on `date`
       - echo Pushing the Docker images...
       - docker push $REPOSITORY_URI:latest
