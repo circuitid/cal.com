@@ -4,7 +4,7 @@ ENV DEBCONF_NOWARNINGS="yes"
 ENV NODE_OPTIONS=--max-old-space-size=8192
 WORKDIR /usr/app
 #COPY * ./
-COPY package.json yarn.lock turbo.json git-init.sh git-setup.sh ./
+COPY package.json yarn.lock turbo.json git-init.sh git-setup.sh .env ./
 COPY apps/web ./apps/web
 COPY packages ./packages
 RUN ls -lh
