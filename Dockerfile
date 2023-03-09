@@ -4,7 +4,7 @@ ENV DEBCONF_NOWARNINGS="yes"
 ENV NODE_OPTIONS=--max-old-space-size=8192
 WORKDIR /usr/app
 #COPY * ./
-COPY package.json yarn.lock turbo.json git-init.sh git-setup.sh .env ./
+COPY package.json yarn.lock turbo.json git-init.sh git-setup.sh .env .eslintrc.js ./
 COPY apps/web ./apps/web
 COPY packages ./packages
 RUN apt-get update
@@ -17,7 +17,7 @@ RUN yarn config set httpTimeout 1000000000
 RUN yarn install --network-timeout 1000000000
 RUN ls -lha
 RUN cat .env
-RUN echo $EMAIL_FROM
+RUN printenv
 RUN yarn build 
 CMD ["yarn", "start"]
 EXPOSE 3000
