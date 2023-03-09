@@ -87,19 +87,13 @@ phases:
       - echo "GOOGLE_API_CREDENTIALS='${GOOGLE_API_CREDENTIALS}'" >> .env
       - cat .env
       - echo Building the Docker image...
-      - docker build -t $REPOSITORY_URI:latest . 
-      - ls -lh
-      - ls -lh /tmp
-      - cat build.log    
+      - docker build -t $REPOSITORY_URI:latest .    
       - echo Docker respository URI is $REPOSITORY_URI
       - echo Docker image tag URI is $IMAGE_TAG
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
     on-failure: ABORT
     commands:
-      - ls -lh
-      - ls -lh /tmp
-      - cat yarn-error.log
       - echo Build completed on `date`
       - echo Pushing the Docker images...
       - docker push $REPOSITORY_URI:latest
