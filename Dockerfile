@@ -17,7 +17,7 @@ RUN yarn config set httpTimeout 1000000000
 RUN yarn install --network-timeout 1000000000
 RUN ls -lha
 RUN cat .env
-RUN echo "Email From TEST*** " $EMAIL_FROM
+RUN echo $EMAIL_FROM
 RUN yarn build 
 CMD ["yarn", "start"]
 EXPOSE 3000
