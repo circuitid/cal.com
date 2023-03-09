@@ -11,7 +11,7 @@ RUN corepack prepare yarn@stable --activate
 RUN yarn set version stable
 RUN yarn -v
 RUN yarn config set httpTimeout 1000000000
-RUN yarn dlx turbo
+RUN yarn dlx -p turbo -q
 RUN corepack prepare yarn@stable --activate
 RUN yarn set version stable
 #RUN turbo prune --scope=@calcom/web --docker
