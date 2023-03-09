@@ -2,6 +2,7 @@ FROM node:18.15.0-bullseye-slim
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS="yes"
 ENV NODE_OPTIONS=--max-old-space-size=8192
+ENV YARN_CACHE_FOLDER="/root/.yarn-cache"
 WORKDIR /usr/app
 COPY * ./
 RUN ls -lh
@@ -11,7 +12,6 @@ RUN corepack prepare yarn@stable --activate
 RUN yarn set version stable
 RUN yarn -v
 RUN yarn config set httpTimeout 1000000000
-RUN yarn config set cache-folder /root/.yarn-cache
 #RUN yarn dlx -p turbo -q
 #RUN turbo prune --scope=@calcom/web --docker
 RUN yarn install --network-timeout 1000000000 --frozen-lockfile
