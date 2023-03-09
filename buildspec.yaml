@@ -49,8 +49,8 @@ phases:
       - echo Build started on `date`
       - echo Logging into Docker...
       - echo $DOCKER_TOKEN | docker login -u $DOCKER_USER --password-stdin
-      - echo Pulling docker node:18.15.0-bullseye-slim image...
-      - docker pull node:18.15.0-bullseye-slim
+      - echo Pulling docker node:18.15.0-bullseye image...
+      - docker pull node:18.15.0-bullseye
       - echo Copying required files
       - cp .env.example .env
       - sed -i "s|TASK_DEFINITION_ARN|${TASK_DEFINITION_ARN}|g" taskdef.json

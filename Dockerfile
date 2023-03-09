@@ -1,4 +1,4 @@
-FROM node:18.15.0-bullseye-slim
+FROM node:18.15.0-bullseye
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS="yes"
 ENV NODE_OPTIONS=--max-old-space-size=8192
