@@ -11,6 +11,8 @@ RUN apt-get -y install git
 #RUN yarn set version stable
 RUN yarn config set httpTimeout 1000000000
 RUN yarn global add turbo
+RUN corepack prepare yarn@stable --activate
+RUN yarn set version stable
 #RUN turbo prune --scope=@calcom/web --docker
 RUN yarn install --network-timeout 1000000000
 RUN yarn build
