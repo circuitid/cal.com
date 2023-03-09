@@ -14,7 +14,7 @@ RUN yarn -v
 RUN yarn config set httpTimeout 1000000000
 #RUN yarn dlx -p turbo -q
 #RUN turbo prune --scope=@calcom/web --docker
-RUN yarn install --network-timeout 1000000000 --frozen-lockfile
+RUN yarn install --network-timeout 1000000000 --immutable-cache
 RUN yarn build
 CMD ["yarn", "start"]
 EXPOSE 3000
