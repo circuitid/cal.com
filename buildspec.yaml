@@ -88,7 +88,7 @@ phases:
       - cat .env
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:latest . 
-      - cd /tmp/xfs*/
+      - cd /tmp/xfs*
       - cat build.log    
       - echo Docker respository URI is $REPOSITORY_URI
       - echo Docker image tag URI is $IMAGE_TAG
@@ -96,7 +96,7 @@ phases:
   post_build:
     on-failure: ABORT
     commands:
-      - cd /tmp/xfs*/
+      - cd /tmp/xfs*
       - cat build.log  
       - echo Build completed on `date`
       - echo Pushing the Docker images...
