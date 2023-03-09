@@ -82,9 +82,8 @@ phases:
       - sed -i "s|NEXT_PUBLIC_APP_NAME=.*|NEXT_PUBLIC_APP_NAME='${NEXT_PUBLIC_APP_NAME}'|" .env
       - sed -i "s|NEXT_PUBLIC_SUPPORT_MAIL_ADDRESS=.*|NEXT_PUBLIC_SUPPORT_MAIL_ADDRESS='${NEXT_PUBLIC_SUPPORT_MAIL_ADDRESS}'|" .env
       - sed -i "s|NEXT_PUBLIC_COMPANY_NAME=.*|NEXT_PUBLIC_COMPANY_NAME='${NEXT_PUBLIC_COMPANY_NAME}'|" .env
-      #- echo "" >> .env
-      #- echo "# Google Credentials" >> .env
-      #- echo "" >> .env
+      - echo -e "\n\n\n"
+      - echo "# Google Credentials" >> .env
       - echo -e "\n\n"
       - echo -e "GOOGLE_API_CREDENTIALS='${GOOGLE_API_CREDENTIALS}'" >> .env
       - cat .env
