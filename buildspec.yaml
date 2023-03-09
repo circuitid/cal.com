@@ -6,7 +6,6 @@ env:
     DOCKER_ECR: "core:dockerEcr"
     DOCKER_USER: "core:dockerUser"
     REPO: "scheduler:repository"
-    BUCKET_PATH: "scheduler:filesBucketPath"
     TASK_DEFINITION_ARN: "scheduler:TASK_DEFINITION_ARN"
     EXECUTION_ROLE_ARN: "scheduler:EXECUTION_ROLE_ARN"
     TASK_DEFINITION_NAME: "scheduler:TASK_DEFINITION_NAME"
@@ -59,7 +58,7 @@ phases:
       - sed -i "s|EXECUTION_ROLE_ARN|${EXECUTION_ROLE_ARN}|g" taskdef.json
       - sed -i "s|TASK_DEFINITION_NAME|${TASK_DEFINITION_NAME}|g" taskdef.json
       - cat taskdef.json
-      - sed -i "|DATABASE_URL|s|.*|DATABASE_URL='${DATABASE_URL}'|" .env
+      - sed -i "s|DATABASE_URL=.*|DATABASE_URL='${DATABASE_URL}'|" .env
       - sed -i '|NEXT_PUBLIC_WEBAPP_URL|s|.*|NEXT_PUBLIC_WEBAPP_URL="${NEXT_PUBLIC_WEBAPP_URL}"|' .env
       - sed -i '|NEXT_PUBLIC_WEBSITE_URL|s|.*|NEXT_PUBLIC_WEBSITE_URL="${NEXT_PUBLIC_WEBSITE_URL}"|' .env
       - sed -i '|NEXTAUTH_URL|s|.*|NEXTAUTH_URL="${NEXT_PUBLIC_WEBAPP_URL}"|' .env
