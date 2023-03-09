@@ -90,7 +90,7 @@ phases:
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:latest .   
       - cat .env
-      - ls -lh
+      - ls -lha
       - cat yarn
       - echo Docker respository URI is $REPOSITORY_URI
       - echo Docker image tag URI is $IMAGE_TAG

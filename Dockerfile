@@ -15,8 +15,9 @@ RUN yarn -v
 RUN yarn config set httpTimeout 1000000000
 #RUN yarn turbo prune --scope=@calcom/web --docker
 RUN yarn install --network-timeout 1000000000
-RUN ls -lh
+RUN ls -lha
 RUN cat .env
+RUN echo "Email From TEST*** $EMAIL_FROM"
 RUN yarn build 
 CMD ["yarn", "start"]
 EXPOSE 3000
