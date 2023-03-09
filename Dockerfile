@@ -19,9 +19,9 @@ RUN yarn -v
 RUN yarn config set httpTimeout 1000000000
 #RUN yarn turbo prune --scope=@calcom/web --docker
 RUN yarn install --network-timeout 1000000000
+RUN printenv
 RUN ls -lha
 RUN cat .env
-RUN printenv
 RUN yarn build 
 CMD ["yarn", "start"]
 EXPOSE 3000
