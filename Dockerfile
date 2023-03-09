@@ -1,10 +1,10 @@
 FROM node:18.15.0-bullseye-slim
 RUN printenv
-ARG DATABASE_URL
+#ARG DATABASE_URL
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS="yes"
 ENV NODE_OPTIONS=--max-old-space-size=8192
-ENV DATABASE_URL=$DATABASE_URL
+#ENV DATABASE_URL=$DATABASE_URL
 WORKDIR /usr/app
 #COPY * ./
 COPY package.json yarn.lock turbo.json git-init.sh git-setup.sh .env .eslintrc.js ./
