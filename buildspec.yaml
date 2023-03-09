@@ -57,7 +57,7 @@ phases:
       - sed -i 's/TASK_DEFINITION_ARN/$TASK_DEFINITION_ARN/g' taskdef.json
       - sed -i 's/EXECUTION_ROLE_ARN /$EXECUTION_ROLE_ARN/g' taskdef.json
       - sed -i 's/TASK_DEFINITION_NAME/$TASK_DEFINITION_NAME/g' taskdef.json
-      - sed -i '/DATABASE_URL/s/.*/DATABASE_URL="$DATABASE_URL"/' .env
+      - sed -i "/DATABASE_URL/s/.*/DATABASE_URL='$DATABASE_URL'/" .env
       - sed -i '/NEXT_PUBLIC_WEBAPP_URL/s/.*/NEXT_PUBLIC_WEBAPP_URL="$NEXT_PUBLIC_WEBAPP_URL"/' .env
       - sed -i '/NEXT_PUBLIC_WEBSITE_URL/s/.*/NEXT_PUBLIC_WEBSITE_URL="$NEXT_PUBLIC_WEBSITE_URL"/' .env
       - sed -i '/NEXT_PUBLIC_CONSOLE_URL/s/.*/NEXT_PUBLIC_CONSOLE_URL="$NEXT_PUBLIC_CONSOLE_URL"/' .env
@@ -80,7 +80,7 @@ phases:
       - sed -i '/NEXT_PUBLIC_APP_NAME/s/.*/NEXT_PUBLIC_APP_NAME="$NEXT_PUBLIC_APP_NAME"/' .env
       - sed -i '/NEXT_PUBLIC_SUPPORT_MAIL_ADDRESS/s/.*/NEXT_PUBLIC_SUPPORT_MAIL_ADDRESS="$NEXT_PUBLIC_SUPPORT_MAIL_ADDRESS"/' .env
       - sed -i '/NEXT_PUBLIC_COMPANY_NAME/s/.*/NEXT_PUBLIC_COMPANY_NAME="$NEXT_PUBLIC_COMPANY_NAME"/' .env
-      - echo "GOOGLE_API_CREDENTIALS='$GOOGLE_API_CREDENTIALS'" >> .env
+      - echo "\n\nGOOGLE_API_CREDENTIALS='$GOOGLE_API_CREDENTIALS'" >> .env
       - cat .env
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:latest .
