@@ -87,6 +87,8 @@ phases:
       - echo "GOOGLE_API_CREDENTIALS='${GOOGLE_API_CREDENTIALS}'" >> .env
       - cat .env
       - ls -lh
+      - echo $EMAIL_FROM
+      - echo ${EMAIL_FROM}
       - export DATABASE_URL=$DATABASE_URL
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:latest .   
