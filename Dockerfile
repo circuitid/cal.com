@@ -5,7 +5,7 @@ WORKDIR /usr/app
 COPY * ./
 RUN ls -lh
 RUN apt-get update
-RUN apt-get install git
+RUN apt-get -y install git
 RUN yarn
 RUN yarn build
 CMD ["yarn", "start"]
