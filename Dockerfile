@@ -11,9 +11,10 @@ RUN corepack prepare yarn@stable --activate
 RUN yarn set version stable
 RUN yarn -v
 RUN yarn config set httpTimeout 1000000000
+RUN - yarn config set cache-folder /root/.yarn-cache
 #RUN yarn dlx -p turbo -q
 #RUN turbo prune --scope=@calcom/web --docker
-RUN yarn install --network-timeout 1000000000
+RUN yarn install --network-timeout 1000000000 --frozen-lockfile
 RUN yarn build
 CMD ["yarn", "start"]
 EXPOSE 3000
