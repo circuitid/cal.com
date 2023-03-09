@@ -89,7 +89,7 @@ phases:
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:latest . 
       - ls -lh
-      - ls -lh /
+      - ls -lh /tmp
       - cat build.log    
       - echo Docker respository URI is $REPOSITORY_URI
       - echo Docker image tag URI is $IMAGE_TAG
@@ -98,7 +98,7 @@ phases:
     on-failure: ABORT
     commands:
       - ls -lh
-      - ls -lh /
+      - ls -lh /tmp
       - cat yarn-error.log
       - echo Build completed on `date`
       - echo Pushing the Docker images...
