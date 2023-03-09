@@ -3,13 +3,7 @@ version: 0.2
 env:
   secrets-manager:
     DOCKER_TOKEN: "tokens:dockerToken"
-    DOCKER_ECR: "core:dockerEcr"
-    DOCKER_USER: "core:dockerUser"
-    REPO: "scheduler:repository"
-    BUCKET_PATH: "scheduler:filesBucketPath"
-    TASK_DEFINITION_ARN: "scheduler:TASK_DEFINITION_ARN "
-    EXECUTION_ROLE_ARN: "scheduler:EXECUTION_ROLE_ARN"
-    TASK_DEFINITION_NAME: "scheduler:TASK_DEFINITION_NAME"
+    
 phases:
   pre_build:
     commands:
