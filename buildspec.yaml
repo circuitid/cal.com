@@ -29,7 +29,7 @@ phases:
       - aws s3 cp s3://$FILES . --recursive
       - ls -lha
       - echo Building the Docker image...
-      - docker build -t $REPOSITORY_URI:latest .   
+      - docker build --env-file .env -t $REPOSITORY_URI:latest .   
       - echo Docker respository URI is $REPOSITORY_URI
       - echo Docker image tag URI is $IMAGE_TAG
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
