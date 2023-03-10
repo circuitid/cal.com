@@ -5,34 +5,7 @@ env:
     DOCKER_TOKEN: "tokens:dockerToken"
     DOCKER_ECR: "core:dockerEcr"
     DOCKER_USER: "core:dockerUser"
-    REPO: "scheduler:repository"
-    TASK_DEFINITION_ARN: "scheduler:TASK_DEFINITION_ARN"
-    EXECUTION_ROLE_ARN: "scheduler:EXECUTION_ROLE_ARN"
-    TASK_DEFINITION_NAME: "scheduler:TASK_DEFINITION_NAME"
-    DATABASE_URL: "scheduler:DATABASE_URL"
-    NEXT_PUBLIC_WEBAPP_URL: "scheduler:NEXT_PUBLIC_WEBAPP_URL"
-    NEXT_PUBLIC_WEBSITE_URL: "scheduler:NEXT_PUBLIC_WEBSITE_URL"
-    NEXT_PUBLIC_CONSOLE_URL: "scheduler:NEXT_PUBLIC_CONSOLE_URL"
-    NEXT_PUBLIC_EMBED_LIB_URL: "scheduler:NEXT_PUBLIC_EMBED_LIB_URL"
-    CRON_API_KEY: "scheduler:CRON_API_KEY"
-    CALENDSO_ENCRYPTION_KEY: "scheduler:CALENDSO_ENCRYPTION_KEY"
-    SENDGRID_API_KEY: "scheduler:SENDGRID_API_KEY"
-    SENDGRID_EMAIL: "scheduler:SENDGRID_EMAIL"
-    NEXT_PUBLIC_SENDGRID_SENDER_NAME: "scheduler:NEXT_PUBLIC_SENDGRID_SENDER_NAME"
-    TWILIO_SID: "scheduler:TWILIO_SID"
-    TWILIO_TOKEN: "scheduler:TWILIO_TOKEN"
-    TWILIO_MESSAGING_SID: "scheduler:TWILIO_MESSAGING_SID"
-    TWILIO_PHONE_NUMBER: "scheduler:TWILIO_PHONE_NUMBER"
-    NEXT_PUBLIC_SENDER_ID: "scheduler:NEXT_PUBLIC_SENDER_ID"
-    TWILIO_VERIFY_SID: "scheduler:TWILIO_VERIFY_SID"
-    EMAIL_FROM: "scheduler:EMAIL_FROM"
-    EMAIL_SERVER_HOST: "scheduler:EMAIL_SERVER_HOST"
-    EMAIL_SERVER_USER: "scheduler:EMAIL_SERVER_USER"
-    EMAIL_SERVER_PASSWORD: "scheduler:EMAIL_SERVER_PASSWORD"
-    NEXT_PUBLIC_APP_NAME: "scheduler:NEXT_PUBLIC_APP_NAME"
-    NEXT_PUBLIC_SUPPORT_MAIL_ADDRESS: "scheduler:NEXT_PUBLIC_SUPPORT_MAIL_ADDRESS"
-    NEXT_PUBLIC_COMPANY_NAME: "scheduler:NEXT_PUBLIC_COMPANY_NAME"
-    GOOGLE_API_CREDENTIALS: "scheduler:GOOGLE_API_CREDENTIALS"
+    FILES: "scheduler:filesPath"
 phases:
   pre_build:
     on-failure: ABORT
@@ -52,45 +25,10 @@ phases:
       - echo Pulling docker node:18.15.0-bullseye-slim image...
       - docker pull node:18.15.0-bullseye-slim
       - echo Copying required files
-      - cp .env.example .env
-      - sed -i "s|TASK_DEFINITION_ARN|${TASK_DEFINITION_ARN}|g" taskdef.json
-      - sed -i "s|EXECUTION_ROLE_ARN|${EXECUTION_ROLE_ARN}|g" taskdef.json
-      - sed -i "s|TASK_DEFINITION_NAME|${TASK_DEFINITION_NAME}|g" taskdef.json
-      - cat taskdef.json
-      - sed -i "s|DATABASE_URL=.*|DATABASE_URL='${DATABASE_URL}'|" .env
-      - sed -i "s|NEXT_PUBLIC_WEBAPP_URL=.*|NEXT_PUBLIC_WEBAPP_URL='${NEXT_PUBLIC_WEBAPP_URL}'|" .env
-      - sed -i "s|NEXT_PUBLIC_WEBSITE_URL=.*|NEXT_PUBLIC_WEBSITE_URL='${NEXT_PUBLIC_WEBSITE_URL}'|" .env
-      - sed -i "s|NEXTAUTH_URL=.*|NEXTAUTH_URL='${NEXT_PUBLIC_WEBAPP_URL}'|" .env
-      - sed -i "s|NEXT_PUBLIC_CONSOLE_URL=.*|NEXT_PUBLIC_CONSOLE_URL='${NEXT_PUBLIC_CONSOLE_URL}'|" .env
-      - sed -i "s|NEXT_PUBLIC_EMBED_LIB_URL=.*|NEXT_PUBLIC_EMBED_LIB_URL='${NEXT_PUBLIC_EMBED_LIB_URL}'|" .env
-      - sed -i "s|CRON_API_KEY=.*|CRON_API_KEY='${CRON_API_KEY}'|" .env
-      - sed -i "s|CALENDSO_ENCRYPTION_KEY=.*|CALENDSO_ENCRYPTION_KEY='${CALENDSO_ENCRYPTION_KEY}'|" .env
-      - sed -i "s|SENDGRID_API_KEY=.*|SENDGRID_API_KEY='${SENDGRID_API_KEY}'|" .env
-      - sed -i "s|SENDGRID_EMAIL=.*|SENDGRID_EMAIL='${SENDGRID_EMAIL}'|" .env
-      - sed -i "s|NEXT_PUBLIC_SENDGRID_SENDER_NAME=.*|NEXT_PUBLIC_SENDGRID_SENDER_NAME='${NEXT_PUBLIC_SENDGRID_SENDER_NAME}'|" .env
-      - sed -i "s|TWILIO_SID=.*|TWILIO_SID='${TWILIO_SID}'|" .env
-      - sed -i "s|TWILIO_TOKEN=.*|TWILIO_TOKEN='${TWILIO_TOKEN}'|" .env
-      - sed -i "s|TWILIO_MESSAGING_SID=.*|TWILIO_MESSAGING_SID='${TWILIO_MESSAGING_SID}'|" .env
-      - sed -i "s|TWILIO_PHONE_NUMBER=.*|TWILIO_PHONE_NUMBER='${TWILIO_PHONE_NUMBER}'|" .env
-      - sed -i "s|NEXT_PUBLIC_SENDER_ID=.*|NEXT_PUBLIC_SENDER_ID='${NEXT_PUBLIC_SENDER_ID}'|" .env
-      - sed -i "s|TWILIO_VERIFY_SID=.*|TWILIO_VERIFY_SID='${TWILIO_VERIFY_SID}'|" .env
-      - sed -i "s|EMAIL_FROM=.*|EMAIL_FROM='${EMAIL_FROM}'|" .env
-      - sed -i "s|EMAIL_SERVER_HOST=.*|EMAIL_SERVER_HOST='${EMAIL_SERVER_HOST}'|" .env
-      - sed -i "s|EMAIL_SERVER_USER=.*|EMAIL_SERVER_USER='${EMAIL_SERVER_USER}'|" .env
-      - sed -i "s|EMAIL_SERVER_PASSWORD=.*|EMAIL_SERVER_PASSWORD='${EMAIL_SERVER_PASSWORD}'|" .env
-      - sed -i "s|NEXT_PUBLIC_APP_NAME=.*|NEXT_PUBLIC_APP_NAME='${NEXT_PUBLIC_APP_NAME}'|" .env
-      - sed -i "s|NEXT_PUBLIC_SUPPORT_MAIL_ADDRESS=.*|NEXT_PUBLIC_SUPPORT_MAIL_ADDRESS='${NEXT_PUBLIC_SUPPORT_MAIL_ADDRESS}'|" .env
-      - sed -i "s|NEXT_PUBLIC_COMPANY_NAME=.*|NEXT_PUBLIC_COMPANY_NAME='${NEXT_PUBLIC_COMPANY_NAME}'|" .env
-      - echo -e "\n\n\n"
-      - echo "# Google Credentials" >> .env
-      - echo -e "\n\n"
-      - echo "GOOGLE_API_CREDENTIALS='${GOOGLE_API_CREDENTIALS}'" >> .env
-      - printenv >> .env     
-      - ls -lh
+      - aws s3 cp -r s3://$FILES .
+      - ls -lhs
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:latest .   
-      - cat .env
-      - ls -lha
       - echo Docker respository URI is $REPOSITORY_URI
       - echo Docker image tag URI is $IMAGE_TAG
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG

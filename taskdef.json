@@ -1,13 +1,13 @@
 {
-  "taskDefinitionArn": "TASK_DEFINITION_ARN",
+  "taskDefinitionArn": "arn:aws:ecs:us-east-1:877563506820:task-definition/scheduler:3",
   "containerDefinitions": [
     {
-      "name": "TASK_DEFINITION_NAME",
+      "name": "scheduler",
       "image": "<IMAGE1_NAME>",
       "cpu": 0,
       "portMappings": [
         {
-          "name": "TASK_DEFINITION_NAME-3000-tcp",
+          "name": "scheduler-3000-tcp",
           "containerPort": 3000,
           "hostPort": 3000,
           "protocol": "tcp"
@@ -21,7 +21,7 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/TASK_DEFINITION_NAME",
+          "awslogs-group": "/ecs/scheduler",
           "awslogs-region": "us-east-1",
           "awslogs-stream-prefix": "ecs"
         }
@@ -35,10 +35,10 @@
       }
     }
   ],
-  "family": "TASK_DEFINITION_NAME",
-  "executionRoleArn": "EXECUTION_ROLE_ARN",
+  "family": "scheduler",
+  "executionRoleArn": "arn:aws:iam::877563506820:role/ecsTaskExecutionRole",
   "networkMode": "awsvpc",
-  "revision": 1,
+  "revision": 3,
   "volumes": [],
   "status": "ACTIVE",
   "requiresAttributes": [
@@ -81,6 +81,8 @@
   "runtimePlatform": {
     "operatingSystemFamily": "LINUX"
   },
+  "registeredAt": "2023-03-10T01:26:54.849Z",
+  "registeredBy": "arn:aws:sts::877563506820:assumed-role/CodeDeploy/1678411614328",
   "tags": [
     {
       "key": "ecs:taskDefinition:createdFrom",
