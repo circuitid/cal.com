@@ -6,6 +6,7 @@ env:
     DOCKER_ECR: "core:dockerEcr"
     DOCKER_USER: "core:dockerUser"
     FILES: "scheduler:filesPath"
+    REPO: "scheduler:repository"
 phases:
   pre_build:
     on-failure: ABORT
