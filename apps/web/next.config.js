@@ -70,6 +70,7 @@ plugins.push(withAxiom);
 /** @type {import("next").NextConfig} */
 const nextConfig = {
   i18n,
+  staticPageGenerationTimeout: 10000,
   productionBrowserSourceMaps: true,
   /* We already do type check on GH actions */
   typescript: {
