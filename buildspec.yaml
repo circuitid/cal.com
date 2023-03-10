@@ -25,7 +25,7 @@ phases:
       - echo Pulling docker node:18.15.0-bullseye-slim image...
       - docker pull node:18.15.0-bullseye-slim
       - echo Copying required files
-      - aws s3 cp -r s3://$FILES . --recursive
+      - aws s3 cp s3://$FILES . --recursive
       - ls -lhs
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:latest .   
