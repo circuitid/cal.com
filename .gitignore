@@ -4,6 +4,7 @@
 taskdef.json
 taskdef-bk.json
 buildspec-bk.yaml
+Dockerfile
 
 # .env file
 .env
