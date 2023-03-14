@@ -58,7 +58,6 @@ import {
   FiArrowLeft,
 } from "@calcom/ui/components/icon";
 
-import FreshChatProvider from "../ee/support/lib/freshchat/FreshChatProvider";
 import { TeamInviteBadge } from "./TeamInviteBadge";
 
 /* TODO: Migate this */
@@ -75,6 +74,11 @@ export const ONBOARDING_NEXT_REDIRECT = {
 export const shouldShowOnboarding = (user: Pick<User, "createdDate" | "completedOnboarding">) => {
   return !user.completedOnboarding && dayjs(user.createdDate).isAfter(ONBOARDING_INTRODUCED_AT);
 };
+
+/*export const hasPaidPlan = (user: Pick<User, "metadata">) => {
+  console.log("user", user)
+  return user && user.metadata && hasKeyInMetadata(user, "isPremium");
+};*/
 
 function useRedirectToLoginIfUnauthenticated(isPublic = false) {
   const { data: session, status } = useSession();
@@ -426,13 +430,6 @@ const navigation: NavigationItemType[] = [
     icon: FiClock,
   },
   {
-    name: "teams",
-    href: "/teams",
-    icon: FiUsers,
-    onlyDesktop: true,
-    badge: <TeamInviteBadge />,
-  },
-  {
     name: "apps",
     href: "/apps",
     icon: FiGrid,
@@ -481,16 +478,32 @@ const navigation: NavigationItemType[] = [
     },
   },
   {
-    name: "workflows",
-    href: "/workflows",
-    icon: FiZap,
-  },
-  {
     name: "settings",
     href: "/settings/my-account/profile",
     icon: FiSettings,
   },
 ];
+
+//if (hasPaidPlan) {
+navigation.push({
+  name: "teams",
+  href: "/teams",
+  icon: FiUsers,
+  onlyDesktop: true,
+  badge: <TeamInviteBadge />,
+});
+navigation.push({
+  name: "workflows",
+  href: "/workflows",
+  icon: FiZap,
+});
+//}
+
+navigation.push({
+  name: "settings",
+  href: "/settings/my-account/profile",
+  icon: FiSettings,
+});
 
 const moreSeparatorIndex = navigation.findIndex((item) => item.name === MORE_SEPARATOR_NAME);
 // We create all needed navigation items for the different use cases
