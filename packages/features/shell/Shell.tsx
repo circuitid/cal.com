@@ -75,11 +75,6 @@ export const shouldShowOnboarding = (user: Pick<User, "createdDate" | "completed
   return !user.completedOnboarding && dayjs(user.createdDate).isAfter(ONBOARDING_INTRODUCED_AT);
 };
 
-/*export const hasPaidPlan = (user: Pick<User, "metadata">) => {
-  console.log("user", user)
-  return user && user.metadata && hasKeyInMetadata(user, "isPremium");
-};*/
-
 function useRedirectToLoginIfUnauthenticated(isPublic = false) {
   const { data: session, status } = useSession();
   const loading = status === "loading";
@@ -403,6 +398,7 @@ export type NavigationItemType = {
     isChild?: boolean;
     router: NextRouter;
   }) => boolean;
+  premium?: boolean;
 };
 
 const requiredCredentialNavigationItems = ["Routing Forms"];
@@ -478,32 +474,25 @@ const navigation: NavigationItemType[] = [
     },
   },
   {
+    name: "teams",
+    href: "/teams",
+    icon: FiUsers,
+    onlyDesktop: true,
+    premium: true,
+    badge: <TeamInviteBadge />,
+  },
+  {
+    name: "workflows",
+    href: "/workflows",
+    premium: true,
+    icon: FiZap,
+  },
+  {
     name: "settings",
     href: "/settings/my-account/profile",
     icon: FiSettings,
   },
 ];
-
-//if (hasPaidPlan) {
-navigation.push({
-  name: "teams",
-  href: "/teams",
-  icon: FiUsers,
-  onlyDesktop: true,
-  badge: <TeamInviteBadge />,
-});
-navigation.push({
-  name: "workflows",
-  href: "/workflows",
-  icon: FiZap,
-});
-//}
-
-navigation.push({
-  name: "settings",
-  href: "/settings/my-account/profile",
-  icon: FiSettings,
-});
 
 const moreSeparatorIndex = navigation.findIndex((item) => item.name === MORE_SEPARATOR_NAME);
 // We create all needed navigation items for the different use cases
@@ -537,6 +526,13 @@ const Navigation = () => {
 
 function useShouldDisplayNavigationItem(item: NavigationItemType) {
   const { status } = useSession();
+  const query = useMeQuery();
+  const user = query.data;
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  if (!user || (item.premium && (!user.metadata || user.metadata?.isPremium !== true))) return false;
+
   const { data: routingForms } = trpc.viewer.appById.useQuery(
     { appId: "routing-forms" },
     {
