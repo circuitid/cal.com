@@ -116,7 +116,7 @@ export default function Login({
       callbackUrl,
       redirect: false,
     });
-    console.log("res", res);
+
     if (!res) setErrorMessage(errorMessages[ErrorCode.InternalServerError]);
     // we're logged in! let's do a hard refresh to the desired url
     else if (!res.error) router.push(callbackUrl);

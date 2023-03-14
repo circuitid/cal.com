@@ -14,7 +14,8 @@ import { useMemo } from "react";
 import { appStoreMetadata } from "@calcom/app-store/appStoreMetaData";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { isMac } from "@calcom/lib/isMac";
-import { RouterOutputs, trpc } from "@calcom/trpc/react";
+import type { RouterOutputs } from "@calcom/trpc/react";
+import { trpc } from "@calcom/trpc/react";
 import { Tooltip } from "@calcom/ui";
 import { FiSearch, FiArrowUp, FiArrowDown, FiCornerDownLeft, FiCommand } from "@calcom/ui/components/icon";
 
@@ -154,14 +155,14 @@ export const KBarRoot = ({ children }: { children: React.ReactNode }) => {
       keywords: "setting profile",
       perform: () => router.push("/settings/my-account/profile"),
     },
-    {
+    /* {
       id: "avatar",
       name: "change_avatar",
       section: "profile",
       shortcut: ["c", "a"],
       keywords: "remove change modify avatar",
       perform: () => router.push("/settings/my-account/profile"),
-    },
+    },*/
     {
       id: "timezone",
       name: "timezone",
