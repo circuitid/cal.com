@@ -14,8 +14,6 @@ export const metadata = {
   publisher: "Cal.com",
   url: "https://jitsi.org/",
   verified: true,
-  rating: 4.5, // TODO: placeholder for now, pull this from TrustPilot or G2
-  reviews: 204, // TODO: placeholder for now, pull this from TrustPilot or G2
   slug: "jitsi",
   title: "Jitsi Meet",
   trending: false,

@@ -3999,6 +3999,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@calcom/cron@workspace:packages/app-store/cron":
+  version: 0.0.0-use.local
+  resolution: "@calcom/cron@workspace:packages/app-store/cron"
+  dependencies:
+    "@calcom/lib": "*"
+    "@calcom/types": "*"
+  languageName: unknown
+  linkType: soft
+
 "@calcom/dailyvideo@*, @calcom/dailyvideo@workspace:packages/app-store/dailyvideo":
   version: 0.0.0-use.local
   resolution: "@calcom/dailyvideo@workspace:packages/app-store/dailyvideo"
@@ -4177,6 +4186,24 @@ __metadata:
   dependencies:
     "@calcom/lib": "*"
     "@calcom/types": "*"
+  languageName: unknown
+  linkType: soft
+
+"@calcom/feature-auth@workspace:packages/features/auth":
+  version: 0.0.0-use.local
+  resolution: "@calcom/feature-auth@workspace:packages/features/auth"
+  dependencies:
+    "@calcom/dayjs": "*"
+    "@calcom/lib": "*"
+    "@calcom/prisma": "*"
+    "@calcom/trpc": "*"
+    "@calcom/ui": "*"
+    bcryptjs: ^2.4.3
+    handlebars: ^4.7.7
+    jose: ^4.13.1
+    next-auth: ^4.20.1
+    nodemailer: ^6.7.8
+    otplib: ^12.0.1
   languageName: unknown
   linkType: soft
 
@@ -4406,9 +4433,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@calcom/routing-forms@workspace:packages/app-store/ee/routing-forms":
+"@calcom/routing-forms@workspace:packages/app-store/routing-forms":
   version: 0.0.0-use.local
-  resolution: "@calcom/routing-forms@workspace:packages/app-store/ee/routing-forms"
+  resolution: "@calcom/routing-forms@workspace:packages/app-store/routing-forms"
   dependencies:
     "@calcom/lib": "*"
     "@calcom/types": "*"
@@ -4744,6 +4771,7 @@ __metadata:
     copy-webpack-plugin: ^11.0.0
     detect-port: ^1.3.0
     dotenv-cli: ^6.0.0
+    entities: ^4.4.0
     env-cmd: ^10.1.0
     eslint: ^8.34.0
     eslint-config-next: ^13.2.1
@@ -4766,7 +4794,7 @@ __metadata:
     module-alias: ^2.2.2
     msw: ^0.42.3
     next: ^13.2.1
-    next-auth: ^4.18.8
+    next-auth: ^4.20.1
     next-axiom: ^0.16.0
     next-collect: ^0.2.1
     next-i18next: ^11.3.0
@@ -4850,6 +4878,16 @@ __metadata:
     "@calcom/types": "*"
     "@types/node-schedule": ^2.1.0
     node-schedule: 2.1.0
+  languageName: unknown
+  linkType: soft
+
+"@calcom/zohocrm@workspace:packages/app-store/zohocrm":
+  version: 0.0.0-use.local
+  resolution: "@calcom/zohocrm@workspace:packages/app-store/zohocrm"
+  dependencies:
+    "@calcom/lib": "*"
+    "@calcom/prisma": "*"
+    "@calcom/types": "*"
   languageName: unknown
   linkType: soft
 
@@ -18533,6 +18571,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"entities@npm:^4.4.0":
+  version: 4.4.0
+  resolution: "entities@npm:4.4.0"
+  checksum: 84d250329f4b56b40fa93ed067b194db21e8815e4eb9b59f43a086f0ecd342814f6bc483de8a77da5d64e0f626033192b1b4f1792232a7ea6b970ebe0f3187c2
+  languageName: node
+  linkType: hard
+
 "entities@npm:~3.0.1":
   version: 3.0.1
   resolution: "entities@npm:3.0.1"
@@ -27829,7 +27874,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"next-auth@npm:^4.18.8":
+"next-auth@npm:^4.20.1":
   version: 4.20.1
   resolution: "next-auth@npm:4.20.1"
   dependencies:

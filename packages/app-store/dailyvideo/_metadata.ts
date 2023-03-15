@@ -11,7 +11,7 @@ export const metadata = {
   variant: "conferencing",
   url: "https://daily.co",
   categories: ["video"],
-  trending: true,
+  trending: false,
   logo: "/api/app-store/dailyvideo/icon.svg",
   publisher: "Cal.com",
   verified: true,
@@ -20,7 +20,7 @@ export const metadata = {
   category: "video",
   slug: "daily-video",
   title: "Cal Video",
-  isGlobal: true,
+  isGlobal: false,
   email: "help@cal.com",
   appData: {
     location: {

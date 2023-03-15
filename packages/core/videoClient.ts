@@ -86,7 +86,7 @@ const createMeeting = async (credential: CredentialWithAppName, calEvent: Calend
     // Default to calVideo
     const defaultMeeting = await createMeetingWithCalVideo(calEvent);
     if (defaultMeeting) {
-      calEvent.location = "integrations:dailyvideo";
+      calEvent.location = "integrations:circuitidmeet";
     }
 
     returnObject = { ...returnObject, createdEvent: defaultMeeting };
@@ -149,19 +149,19 @@ const deleteMeeting = (credential: CredentialPayload, uid: string): Promise<unkn
 
 // @TODO: This is a temporary solution to create a meeting with cal.com video as fallback url
 const createMeetingWithCalVideo = async (calEvent: CalendarEvent) => {
-  let dailyAppKeys: Awaited<ReturnType<typeof getDailyAppKeys>>;
+  /* let dailyAppKeys: Awaited<ReturnType<typeof getDailyAppKeys>>;
   try {
     dailyAppKeys = await getDailyAppKeys();
   } catch (e) {
     return;
-  }
+  }*/
   const [videoAdapter] = getVideoAdapters([
     {
       id: 0,
-      appId: "daily-video",
-      type: "daily_video",
+      appId: "circuitidmeet",
+      type: "circuitidmeet_video",
       userId: null,
-      key: dailyAppKeys,
+      key: {},
       invalid: false,
     },
   ]);

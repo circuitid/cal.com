@@ -13,7 +13,7 @@ const CircuitIDMeetApiAdapter = (): VideoApiAdapter => {
       console.log("scheduling event", event);
       const meetingID = uuidv4();
       return Promise.resolve({
-        type: "circuit-id-meet_video",
+        type: "circuitidmeet_video",
         id: meetingID,
         password: "",
         url: "https://meet.circuitid.com/",
@@ -24,7 +24,7 @@ const CircuitIDMeetApiAdapter = (): VideoApiAdapter => {
     },
     updateMeeting: (bookingRef: PartialReference): Promise<VideoCallData> => {
       return Promise.resolve({
-        type: "circuit-id-meet_video",
+        type: "circuitidmeet_video",
         id: bookingRef.meetingId as string,
         password: bookingRef.meetingPassword as string,
         url: bookingRef.meetingUrl as string,
