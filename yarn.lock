@@ -3939,9 +3939,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@calcom/circuit-id-meet@workspace:packages/app-store/circuitidmeetvideo":
+"@calcom/circuitidmeet@workspace:packages/app-store/circuitidmeetvideo":
   version: 0.0.0-use.local
-  resolution: "@calcom/circuit-id-meet@workspace:packages/app-store/circuitidmeetvideo"
+  resolution: "@calcom/circuitidmeet@workspace:packages/app-store/circuitidmeetvideo"
   dependencies:
     "@calcom/lib": "*"
     "@calcom/types": "*"
