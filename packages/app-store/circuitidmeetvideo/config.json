@@ -1,6 +1,6 @@
 {
   "name": "Circuit ID Meet",
-  "slug": "circuitidmeetvideo",
+  "slug": "circuitidmeet",
   "installed": true,
   "trending": true,
   "type": "circuitidmeet_video",
@@ -20,7 +20,7 @@
   "appData": {
     "location": {
       "linkType": "dynamic",
-      "type": "integrations:circuitidmeetvideo",
+      "type": "integrations:circuitidmeet",
       "label": "Circuit ID Meet"
     }
   }
