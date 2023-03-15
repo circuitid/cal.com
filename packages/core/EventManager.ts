@@ -96,11 +96,11 @@ export default class EventManager {
   public async create(event: CalendarEvent): Promise<CreateUpdateResult> {
     const evt = processLocation(event);
     // Fallback to cal video if no location is set
-    if (!evt.location) evt["location"] = "integrations:daily";
+    if (!evt.location) evt["location"] = "integrations:circuitidmeetvideo";
 
     // Fallback to Cal Video if Google Meet is selected w/o a Google Cal
     if (evt.location === MeetLocationType && evt.destinationCalendar?.integration !== "google_calendar") {
-      evt["location"] = "integrations:daily";
+      evt["location"] = "integrations:circuitidmeetvideo";
     }
     const isDedicated = evt.location ? isDedicatedIntegration(evt.location) : null;
 
