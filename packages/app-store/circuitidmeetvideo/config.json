@@ -1,19 +1,25 @@
 {
-  "/*": "Don't modify slug - If required, do it using cli edit command",
-  "name": "circuitidmeetvideo",
+  "name": "Circuit ID Meet",
   "slug": "circuitidmeetvideo",
-  "type": "circuitidmeetvideo_video",
-  "imageSrc": "icon.svg",
-  "logo": "icon.svg",
-  "url": "https://example.com/link",
+  "installed": true,
+  "trending": true,
+  "type": "circuitidmeet_video",
+  "imageSrc": "/api/app-store/circuitidmeetvideo/icon.svg",
+  "logo": "/api/app-store/circuitidmeetvideo/icon.svg",
+  "url": "https://www.circuitid.com",
+  "verified": true,
+  "isGlobal": true,
   "variant": "conferencing",
-  "categories": [
-    "video"
-  ],
+  "categories": ["video"],
   "publisher": "Circuit ID, Inc.",
   "email": "support@helpdesk.circuitid.com",
   "description": "Circuit ID is a video conferencing software for web, desktop and mobile devices.",
   "isTemplate": false,
-  "__createdUsingCli": true,
-  "__template": "basic"
+  "appData": {
+    "location": {
+      "linkType": "dynamic",
+      "type": "integrations:circuitidmeetvideo",
+      "label": "Circuit ID Meet"
+    }
+  }
 }
