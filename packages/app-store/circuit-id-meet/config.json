@@ -4,15 +4,12 @@
   "type": "circuit-id-meet_video",
   "imageSrc": "icon.svg",
   "logo": "icon.svg",
-  "url": "https://example.com/link",
+  "url": "https://www.circuitid.com",
   "variant": "conferencing",
-  "categories": [
-    "video"
-  ],
+  "categories": ["video"],
   "publisher": "Circuit ID, Inc.",
   "email": "support@helpdesk.circuitid.com",
   "description": "Circuit ID is a video conferencing software for web, desktop and mobile devices.",
   "isTemplate": false,
-  "__createdUsingCli": true,
-  "__template": "general-app-settings"
+  "__createdUsingCli": true
 }

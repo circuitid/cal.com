@@ -1,16 +1,47 @@
-import { createDefaultInstallation } from "@calcom/app-store/_utils/installation";
-import type { AppDeclarativeHandler } from "@calcom/types/AppHandler";
+import type { NextApiRequest, NextApiResponse } from "next";
 
-import appConfig from "../config.json";
+import prisma from "@calcom/prisma";
 
-const handler: AppDeclarativeHandler = {
-  appType: appConfig.type,
-  variant: appConfig.variant,
-  slug: appConfig.slug,
-  supportsMultipleInstalls: false,
-  handlerType: "add",
-  createCredential: ({ appType, user, slug }) =>
-    createDefaultInstallation({ appType, userId: user.id, slug, key: {} }),
-};
+import getInstalledAppPath from "../../_utils/getInstalledAppPath";
 
-export default handler;
+/**
+ * This is an example endpoint for an app, these will run under `/api/integrations/[...args]`
+ * @param req
+ * @param res
+ */
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (!req.session?.user?.id) {
+    return res.status(401).json({ message: "You must be logged in to do this" });
+  }
+  const appType = "circuit-id-meet_video";
+  try {
+    const alreadyInstalled = await prisma.credential.findFirst({
+      where: {
+        type: appType,
+        userId: req.session.user.id,
+      },
+    });
+    if (alreadyInstalled) {
+      throw new Error("Already installed");
+    }
+    const installation = await prisma.credential.create({
+      data: {
+        type: appType,
+        key: {},
+        userId: req.session.user.id,
+        appId: "circuit-id-meet",
+      },
+    });
+    if (!installation) {
+      throw new Error("Unable to create user credential for circuit-id-meet");
+    }
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return res.status(500).json({ message: error.message });
+    }
+    return res.status(500);
+  }
+  return res
+    .status(200)
+    .json({ url: getInstalledAppPath({ variant: "conferencing", slug: "circuit-id-meet" }) });
+}
