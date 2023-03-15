@@ -16,7 +16,7 @@ const CircuitIDMeetApiAdapter = (): VideoApiAdapter => {
         type: "circuit-id-meet_video",
         id: meetingID,
         password: "",
-        url: "https://meet.circuitid.com/" + event.uid,
+        url: "https://meet.circuitid.com/",
       });
     },
     deleteMeeting: async (): Promise<void> => {

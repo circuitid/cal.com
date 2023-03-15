@@ -5,7 +5,7 @@ import _package from "./package.json";
 export const metadata = {
   name: "Jitsi Video",
   description: _package.description,
-  installed: true,
+  installed: false,
   type: "jitsi_video",
   imageSrc: "/api/app-store/jitsivideo/icon.svg",
   variant: "conferencing",
@@ -14,11 +14,11 @@ export const metadata = {
   publisher: "Cal.com",
   url: "https://jitsi.org/",
   verified: true,
-  rating: 0, // TODO: placeholder for now, pull this from TrustPilot or G2
-  reviews: 0, // TODO: placeholder for now, pull this from TrustPilot or G2
+  rating: 4.5, // TODO: placeholder for now, pull this from TrustPilot or G2
+  reviews: 204, // TODO: placeholder for now, pull this from TrustPilot or G2
   slug: "jitsi",
   title: "Jitsi Meet",
-  trending: true,
+  trending: false,
   isGlobal: false,
   email: "help@cal.com",
   appData: {
