@@ -7,6 +7,7 @@ import { metadata as applecalendar__metadata_ts } from "./applecalendar/_metadat
 import around_config_json from "./around/config.json";
 import { metadata as caldavcalendar__metadata_ts } from "./caldavcalendar/_metadata";
 import campfire_config_json from "./campfire/config.json";
+import { metadata as circuitidmeet__metadata_ts } from "./circuitidmeet/_metadata";
 import closecom_config_json from "./closecom/config.json";
 import { metadata as dailyvideo__metadata_ts } from "./dailyvideo/_metadata";
 import routing_forms_config_json from "./ee/routing-forms/config.json";
@@ -63,6 +64,7 @@ export const appStoreMetadata = {
   around: around_config_json,
   caldavcalendar: caldavcalendar__metadata_ts,
   campfire: campfire_config_json,
+  circuitidmeet: circuitidmeet__metadata_ts,
   closecom: closecom_config_json,
   dailyvideo: dailyvideo__metadata_ts,
   "routing-forms": routing_forms_config_json,

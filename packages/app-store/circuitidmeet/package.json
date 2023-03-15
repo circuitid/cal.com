@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "name": "@circuitid/calcom-meet",
+  "version": "1.0.0",
+  "main": "./index.ts",
+  "description": "Circuit ID is a video conferencing software for web, desktop and mobile devices.",
+  "dependencies": {
+    "@calcom/lib": "*"
+  },
+  "devDependencies": {
+    "@calcom/types": "*"
+  }
+}

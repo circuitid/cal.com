@@ -8,6 +8,7 @@ export const InstallAppButtonMap = {
   applecalendar: dynamic(() => import("./applecalendar/components/InstallAppButton")),
   around: dynamic(() => import("./around/components/InstallAppButton")),
   caldavcalendar: dynamic(() => import("./caldavcalendar/components/InstallAppButton")),
+  circuitidmeet: dynamic(() => import("./circuitidmeet/components/InstallAppButton")),
   closecom: dynamic(() => import("./closecom/components/InstallAppButton")),
   exchange2013calendar: dynamic(() => import("./exchange2013calendar/components/InstallAppButton")),
   exchange2016calendar: dynamic(() => import("./exchange2016calendar/components/InstallAppButton")),
