@@ -4863,15 +4863,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@circuitid/calcom-meet@workspace:packages/app-store/circuitidmeet":
-  version: 0.0.0-use.local
-  resolution: "@circuitid/calcom-meet@workspace:packages/app-store/circuitidmeet"
-  dependencies:
-    "@calcom/lib": "*"
-    "@calcom/types": "*"
-  languageName: unknown
-  linkType: soft
-
 "@cnakazawa/watch@npm:^1.0.3":
   version: 1.0.4
   resolution: "@cnakazawa/watch@npm:1.0.4"
