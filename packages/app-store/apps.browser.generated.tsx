@@ -30,6 +30,7 @@ export const InstallAppButtonMap = {
   zoomvideo: dynamic(() => import("./zoomvideo/components/InstallAppButton")),
 };
 export const AppSettingsComponentsMap = {
+  "circuit-id-meet": dynamic(() => import("./circuit-id-meet/components/AppSettingsInterface")),
   "general-app-settings": dynamic(() =>
     import("./templates/general-app-settings/components/AppSettingsInterface")
   ),

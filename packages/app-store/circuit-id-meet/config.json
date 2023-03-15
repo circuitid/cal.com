@@ -1,0 +1,18 @@
+{
+  "name": "Circuit ID Meet",
+  "slug": "circuit-id-meet",
+  "type": "circuit-id-meet_video",
+  "imageSrc": "icon.svg",
+  "logo": "icon.svg",
+  "url": "https://example.com/link",
+  "variant": "conferencing",
+  "categories": [
+    "video"
+  ],
+  "publisher": "Circuit ID, Inc.",
+  "email": "support@helpdesk.circuitid.com",
+  "description": "Circuit ID is a video conferencing software for web, desktop and mobile devices.",
+  "isTemplate": false,
+  "__createdUsingCli": true,
+  "__template": "general-app-settings"
+}
