@@ -279,5 +279,14 @@
     "slug": "circuit-id-meet",
     "type": "circuit-id-meet_video",
     "isTemplate": false
+  },
+  {
+    "dirName": "circuitidmeetvideo",
+    "categories": [
+      "video"
+    ],
+    "slug": "circuitidmeetvideo",
+    "type": "circuitidmeetvideo_video",
+    "isTemplate": false
   }
 ]

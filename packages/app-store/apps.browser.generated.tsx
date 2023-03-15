@@ -8,7 +8,6 @@ export const InstallAppButtonMap = {
   applecalendar: dynamic(() => import("./applecalendar/components/InstallAppButton")),
   around: dynamic(() => import("./around/components/InstallAppButton")),
   caldavcalendar: dynamic(() => import("./caldavcalendar/components/InstallAppButton")),
-  "circuit-id-meet": dynamic(() => import("./circuit-id-meet/components/InstallAppButton")),
   closecom: dynamic(() => import("./closecom/components/InstallAppButton")),
   exchange2013calendar: dynamic(() => import("./exchange2013calendar/components/InstallAppButton")),
   exchange2016calendar: dynamic(() => import("./exchange2016calendar/components/InstallAppButton")),
@@ -30,7 +29,6 @@ export const InstallAppButtonMap = {
   zoomvideo: dynamic(() => import("./zoomvideo/components/InstallAppButton")),
 };
 export const AppSettingsComponentsMap = {
-  "circuit-id-meet": dynamic(() => import("./circuit-id-meet/components/AppSettingsInterface")),
   "general-app-settings": dynamic(() =>
     import("./templates/general-app-settings/components/AppSettingsInterface")
   ),
