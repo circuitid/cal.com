@@ -86,7 +86,7 @@ const createMeeting = async (credential: CredentialWithAppName, calEvent: Calend
     // Default to calVideo
     const defaultMeeting = await createMeetingWithCalVideo(calEvent);
     if (defaultMeeting) {
-      calEvent.location = "integrations:circuitidmeetvideo";
+      calEvent.location = "integrations:circuitidmeet";
     }
 
     returnObject = { ...returnObject, createdEvent: defaultMeeting };
@@ -158,7 +158,7 @@ const createMeetingWithCalVideo = async (calEvent: CalendarEvent) => {
   const [videoAdapter] = getVideoAdapters([
     {
       id: 0,
-      appId: "circuitidmeetvideo",
+      appId: "circuitidmeet",
       type: "circuitidmeet_video",
       userId: null,
       key: {},
