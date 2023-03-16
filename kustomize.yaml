@@ -38,13 +38,6 @@ on:
     branches: [$default-branch]
   workflow_dispatch:
 
-env:
-  AZURE_CONTAINER_REGISTRY: "your-azure-container-registry"
-  CONTAINER_NAME: "your-container-name"
-  RESOURCE_GROUP: "your-resource-group"
-  CLUSTER_NAME: "your-cluster-name"
-  KUSTOMIZE_PATH: "your-kustomize-path"
-
 jobs:
   buildImage:
     permissions:
@@ -66,7 +59,7 @@ jobs:
       # Builds and pushes an image up to your Azure Container Registry
       - name: Build and push image to ACR
         run: |
-          az acr build --image ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_NAME }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.RESOURCE_GROUP }} .
+          az acr build --image ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.CONTAINER_NAME }}:${{ github.sha }} --registry ${{ secrets.AZURE_CONTAINER_REGISTRY }} -g ${{ secrets.RESOURCE_GROUP }} .
 
   deploy:
     permissions:
@@ -97,8 +90,8 @@ jobs:
       - name: Get K8s context
         uses: azure/aks-set-context@v3
         with:
-          resource-group: ${{ env.RESOURCE_GROUP }}
-          cluster-name: ${{ env.CLUSTER_NAME }}
+          resource-group: ${{ secrets.RESOURCE_GROUP }}
+          cluster-name: ${{ secrets.CLUSTER_NAME }}
           admin: "false"
           use-kubelogin: "true"
 
@@ -107,7 +100,7 @@ jobs:
         uses: azure/k8s-bake@v2
         with:
           renderEngine: "kustomize"
-          kustomizationPath: ${{ env.KUSTOMIZE_PATH }}
+          kustomizationPath: ${{ secrets.KUSTOMIZE_PATH }}
           kubectl-version: latest
         id: bake
 
@@ -118,4 +111,4 @@ jobs:
           action: deploy
           manifests: ${{ steps.bake.outputs.manifestsBundle }}
           images: |
-            ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_NAME }}:${{ github.sha }}
+            ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.CONTAINER_NAME }}:${{ github.sha }}
