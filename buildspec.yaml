@@ -23,7 +23,7 @@ phases:
       - echo Build started on `date`
       - echo Logging into Docker...
       - echo $DOCKER_TOKEN | docker login -u $DOCKER_USER --password-stdin
-      - docker pull ubuntu:latest
+      - docker pull node:18
       - echo Copying required files
       - aws s3 cp s3://$FILES . --recursive
       - ls -lha
