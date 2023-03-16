@@ -70,7 +70,7 @@ plugins.push(withAxiom);
 /** @type {import("next").NextConfig} */
 const nextConfig = {
   i18n,
-  staticPageGenerationTimeout: 600, // added to support node 18 and yarn 3.0 by brandon on 03/11/23
+  //staticPageGenerationTimeout: 600, // added to support node 18 and yarn 3.0 by brandon on 03/11/23
   productionBrowserSourceMaps: true,
   /* We already do type check on GH actions */
   typescript: {
