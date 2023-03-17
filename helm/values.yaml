@@ -1,7 +1,6 @@
 # UI controll
-title: 'Circuit ID SCheduler Kubernetes Helm Chart'
+title: 'Circuit ID Scheduler Kubernetes Helm Chart'
 
 # Service controlls
-serviceName: scheduler
 serviceType: ClusterIP
 registry: circuitid
