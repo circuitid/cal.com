@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: "{{.Chart.Name}}-{{.Release.Name}}"
+   namespace: {{.Release.Namespace}}
+spec:
+   replicas: 1
+   selector:
+      matchLabels:
+         app: "{{.Chart.Name}}-{{.Release.Name}}"
+   template:
+      metadata:
+         labels:
+            app: "{{.Chart.Name}}-{{.Release.Name}}"
+      spec:
+         containers:
+            - name: "{{.Chart.Name}}-{{.Release.Name}}"
+              image:  "{{.Values.registry}}.azurecr.io/{{.Chart.Name}}:v1"
+              ports:
+                 - containerPort: 3000
+              env:
+                 - name: TITLE
+                   value: "{{.Values.title}}"

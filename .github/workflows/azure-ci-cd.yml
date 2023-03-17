@@ -31,7 +31,7 @@
 # For more samples to get started with GitHub Action workflows to deploy to Azure, refer to https://github.com/Azure/actions-workflow-samples
 # For more options with the actions used below please refer to https://github.com/Azure/login
 
-name: Deploy Azure Kubernetes
+name: Deploy to Azure Kubernetes
 
 on:
   push:
@@ -67,7 +67,7 @@ jobs:
       # Builds and pushes an image up to your Azure Container Registry
       - name: Build and push image to ACR
         run: |
-          az acr build --image ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.CONTAINER_NAME }}:${{ github.sha }} --registry ${{ secrets.AZURE_CONTAINER_REGISTRY }} -g ${{ secrets.RESOURCE_GROUP }} .
+          az acr build --image ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ secrets.CONTAINER_NAME }}:v1 --registry ${{ secrets.AZURE_CONTAINER_REGISTRY }} -g ${{ secrets.RESOURCE_GROUP }} .
 
   deploy:
     permissions:
@@ -103,11 +103,12 @@ jobs:
 
       # Runs Kustomize to create manifest files
       - name: Bake deployment
-        uses: azure/k8s-bake@v2
+        uses: azure/k8s-bake@v2.2
         with:
-          renderEngine: "kustomize"
-          kustomizationPath: ${{ secrets.KUSTOMIZE_PATH }}
-          kubectl-version: latest
+          renderEngine: "helm"
+          helmChart: "helm"
+          helm-version: 'latest'
+          silent: 'false'
         id: bake
 
       # Deploys application based on manifest files from previous step
