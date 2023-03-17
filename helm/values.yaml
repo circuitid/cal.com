@@ -4,3 +4,5 @@ title: 'Circuit ID Scheduler Kubernetes Helm Chart'
 # Service controlls
 serviceType: ClusterIP
 registry: circuitid
+appPort: 3000
+replicas: 1
