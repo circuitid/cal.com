@@ -2,7 +2,12 @@
 title: 'Circuit ID Scheduler Kubernetes Helm Chart'
 
 # Service controlls
-serviceType: ClusterIP
+serviceType: LoadBalancer
 registry: circuitid
 appPort: 3000
-replicas: 1
+replicas: 2
+namespace: scheduler
+respository: scheduler
+loadBalancerIP: "20.96.151.80"
+dnsLabel: scheduler
+domain: scheduler.circuitid.com
