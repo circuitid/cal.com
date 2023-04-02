@@ -21,3 +21,13 @@ spec:
               env:
                  - name: TITLE
                    value: "{{.Values.title}}"
+              readinessProbe:
+               tcpSocket:
+                 port: {{ .Values.appPort }}
+               initialDelaySeconds: 10
+               periodSeconds: 10
+              livenessProbe:
+               tcpSocket:
+                 port: {{ .Values.appPort }}
+               initialDelaySeconds: 10
+               periodSeconds: 30
