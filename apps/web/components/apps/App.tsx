@@ -13,16 +13,7 @@ import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { trpc } from "@calcom/trpc/react";
 import type { App as AppType } from "@calcom/types/App";
 import { Button, showToast, SkeletonButton, SkeletonText, HeadSeo, Badge } from "@calcom/ui";
-import {
-  FiBookOpen,
-  FiCheck,
-  FiExternalLink,
-  FiFile,
-  FiFlag,
-  FiMail,
-  FiPlus,
-  FiShield,
-} from "@calcom/ui/components/icon";
+import { BookOpen, Check, ExternalLink, File, Flag, Mail, Plus, Shield } from "@calcom/ui/components/icon";
 
 /* These app slugs all require Google Cal to be installed */
 
@@ -140,7 +131,7 @@ const Component = ({
           isGlobal ||
           (existingCredentials.length > 0 && allowedMultipleInstalls ? (
             <div className="flex space-x-3">
-              <Button StartIcon={FiCheck} color="secondary" disabled>
+              <Button StartIcon={Check} color="secondary" disabled>
                 {existingCredentials.length > 0
                   ? t("active_install", { count: existingCredentials.length })
                   : t("default")}
@@ -162,7 +153,7 @@ const Component = ({
                     }
                     return (
                       <Button
-                        StartIcon={FiPlus}
+                        StartIcon={Plus}
                         {...props}
                         // @TODO: Overriding color and size prevent us from
                         // having to duplicate InstallAppButton for now.
@@ -264,7 +255,7 @@ const Component = ({
                 rel="noreferrer"
                 className="text-sm font-normal text-black no-underline hover:underline"
                 href={docs}>
-                <FiBookOpen className="mr-1 -mt-1 inline h-4 w-4 text-gray-500" />
+                <BookOpen className="mr-1 -mt-1 inline h-4 w-4 text-gray-500" />
                 {t("documentation")}
               </a>
             </li>
@@ -276,7 +267,7 @@ const Component = ({
                 rel="noreferrer"
                 className="font-normal text-black no-underline hover:underline"
                 href={website}>
-                <FiExternalLink className="mr-1 -mt-px inline h-4 w-4 text-gray-500" />
+                <ExternalLink className="mr-1 -mt-px inline h-4 w-4 text-gray-500" />
                 {website.replace("https://", "")}
               </a>
             </li>
@@ -288,7 +279,7 @@ const Component = ({
                 rel="noreferrer"
                 className="font-normal text-black no-underline hover:underline"
                 href={"mailto:" + email}>
-                <FiMail className="mr-1 -mt-px inline h-4 w-4 text-gray-500" />
+                <Mail className="mr-1 -mt-px inline h-4 w-4 text-gray-500" />
 
                 {email}
               </a>
@@ -301,7 +292,7 @@ const Component = ({
                 rel="noreferrer"
                 className="font-normal text-black no-underline hover:underline"
                 href={tos}>
-                <FiFile className="mr-1 -mt-px inline h-4 w-4 text-gray-500" />
+                <File className="mr-1 -mt-px inline h-4 w-4 text-gray-500" />
                 {t("terms_of_service")}
               </a>
             </li>
@@ -313,7 +304,7 @@ const Component = ({
                 rel="noreferrer"
                 className="font-normal text-black no-underline hover:underline"
                 href={privacy}>
-                <FiShield className="mr-1 -mt-px inline h-4 w-4 text-gray-500" />
+                <Shield className="mr-1 -mt-px inline h-4 w-4 text-gray-500" />
                 {t("privacy_policy")}
               </a>
             </li>
@@ -324,7 +315,7 @@ const Component = ({
           {t("every_app_published", { appName: APP_NAME, companyName: COMPANY_NAME })}
         </span>
         <a className="mt-2 block text-xs text-red-500" href={`mailto:${SUPPORT_MAIL_ADDRESS}`}>
-          <FiFlag className="inline h-3 w-3" /> {t("report_app")}
+          <Flag className="inline h-3 w-3" /> {t("report_app")}
         </a>
       </div>
     </div>
