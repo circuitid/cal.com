@@ -259,7 +259,9 @@ const Component = ({
           (website && !website?.includes("cal.com")) ||
           (email && email != "help@cal.com") ||
           tos ||
-          privacy) && <h4 className="text-emphasis mt-8 mb-2 font-semibold text-gray-900 ">{t("learn_more")}</h4>}
+          privacy) && (
+          <h4 className="text-emphasis mt-8 mb-2 font-semibold text-gray-900 ">{t("learn_more")}</h4>
+        )}
         <ul className="prose-sm -ml-1 -mr-1 leading-5">
           {docs && (
             <li>
