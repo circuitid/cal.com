@@ -26,6 +26,7 @@ import {
   DialogFooter,
   DialogTrigger,
   Form,
+  ImageUploader,
   Label,
   Meta,
   PasswordField,
@@ -353,22 +354,28 @@ const ProfileForm = ({
           name="avatar"
           render={({ field: { value } }) => (
             <>
-              <Avatar alt="" imageSrc={value} gravatarFallbackMd5={emailMd5} size="lg" />
+              <Avatar alt="" imageSrc={value} gravatarFallbackMd5="fallback" size="lg" />
+              <div className="ms-4">
+                <ImageUploader
+                  target="avatar"
+                  id="avatar-upload"
+                  buttonMsg={t("change_avatar")}
+                  handleAvatarChange={(newAvatar) => {
+                    formMethods.setValue("avatar", newAvatar, { shouldDirty: true });
+                  }}
+                  imageSrc={value || undefined}
+                />
+              </div>
             </>
           )}
         />
       </div>
       {extraField}
       <div className="mt-8">
-        <TextField label={t("full_name")} disabled={true} {...formMethods.register("name")} />
+        <TextField label={t("full_name")} {...formMethods.register("name")} />
       </div>
       <div className="mt-8">
-        <TextField
-          label={t("email")}
-          disabled={true}
-          hint={t("change_email_hint")}
-          {...formMethods.register("email")}
-        />
+        <TextField label={t("email")} hint={t("change_email_hint")} {...formMethods.register("email")} />
       </div>
       <div className="mt-8">
         <Label>{t("about")}</Label>
