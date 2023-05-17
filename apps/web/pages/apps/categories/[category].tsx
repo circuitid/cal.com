@@ -1,4 +1,3 @@
-import { AppCategories } from "@prisma/client";
 import type { GetStaticPropsContext, InferGetStaticPropsType } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -7,7 +6,10 @@ import { getAppRegistry } from "@calcom/app-store/_appRegistry";
 import Shell from "@calcom/features/shell/Shell";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import prisma from "@calcom/prisma";
+import { AppCategories } from "@calcom/prisma/enums";
 import { AppCard, SkeletonText } from "@calcom/ui";
+
+import PageWrapper from "@components/PageWrapper";
 
 export default function Apps({ apps }: InferGetStaticPropsType<typeof getStaticProps>) {
   const { t, isLocaleReady } = useLocale();
@@ -24,11 +26,11 @@ export default function Apps({ apps }: InferGetStaticPropsType<typeof getStaticP
           <>
             <Link
               href="/apps"
-              className="inline-flex items-center justify-start gap-1 rounded-sm py-2 text-gray-900">
+              className="text-emphasis inline-flex items-center justify-start gap-1 rounded-sm py-2">
               {isLocaleReady ? t("app_store") : <SkeletonText className="h-4 w-24" />}{" "}
             </Link>
             {category && (
-              <span className="gap-1 text-gray-600">
+              <span className="text-default gap-1">
                 <span>&nbsp;/&nbsp;</span>
                 {t("category_apps", { category: category[0].toUpperCase() + category?.slice(1) })}
               </span>
@@ -46,6 +48,8 @@ export default function Apps({ apps }: InferGetStaticPropsType<typeof getStaticP
     </>
   );
 }
+
+Apps.PageWrapper = PageWrapper;
 
 export const getStaticPaths = async () => {
   const paths = Object.keys(AppCategories);

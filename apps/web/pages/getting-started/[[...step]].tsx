@@ -2,6 +2,7 @@ import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import type { CSSProperties } from "react";
 import { z } from "zod";
 
 import { getServerSession } from "@calcom/features/auth/lib/getServerSession";
@@ -12,7 +13,9 @@ import { Button, StepCard, Steps } from "@calcom/ui";
 
 import type { inferSSRProps } from "@lib/types/inferSSRProps";
 
+import PageWrapper from "@components/PageWrapper";
 import { ConnectedCalendars } from "@components/getting-started/steps-views/ConnectCalendars";
+import { ConnectedVideoStep } from "@components/getting-started/steps-views/ConnectedVideoStep";
 import { SetupAvailability } from "@components/getting-started/steps-views/SetupAvailability";
 import UserProfile from "@components/getting-started/steps-views/UserProfile";
 import { UserSettings } from "@components/getting-started/steps-views/UserSettings";
@@ -20,7 +23,13 @@ import { UserSettings } from "@components/getting-started/steps-views/UserSettin
 export type IOnboardingPageProps = inferSSRProps<typeof getServerSideProps>;
 
 const INITIAL_STEP = "user-settings";
-const steps = ["user-settings", "connected-calendar", "setup-availability", "user-profile"] as const;
+const steps = [
+  "user-settings",
+  "connected-calendar",
+  "connected-video",
+  "setup-availability",
+  "user-profile",
+] as const;
 
 const stepTransform = (step: (typeof steps)[number]) => {
   const stepIndex = steps.indexOf(step);
@@ -34,9 +43,9 @@ const stepRouteSchema = z.object({
   step: z.array(z.enum(steps)).default([INITIAL_STEP]),
 });
 
+// TODO: Refactor how steps work to be contained in one array/object. Currently we have steps,initalsteps,headers etc. These can all be in one place
 const OnboardingPage = (props: IOnboardingPageProps) => {
   const router = useRouter();
-
   const { user } = props;
   const { t } = useLocale();
 
@@ -54,6 +63,11 @@ const OnboardingPage = (props: IOnboardingPageProps) => {
       skipText: `${t("connect_calendar_later")}`,
     },
     {
+      title: `${t("connect_your_video_app")}`,
+      subtitle: [`${t("connect_your_video_app_instructions")}`],
+      skipText: `${t("set_up_later")}`,
+    },
+    {
       title: `${t("set_availability")}`,
       subtitle: [
         `${t("set_availability_getting_started_subtitle_1")}`,
@@ -65,6 +79,17 @@ const OnboardingPage = (props: IOnboardingPageProps) => {
       subtitle: [`${t("nearly_there_instructions")}`],
     },
   ];
+
+  // TODO: Add this in when we have solved the ability to move to tokens accept invite and note invitedto
+  // Ability to accept other pending invites if any (low priority)
+  // if (props.hasPendingInvites) {
+  //   headers.unshift(
+  //     props.hasPendingInvites && {
+  //       title: `${t("email_no_user_invite_heading", { appName: APP_NAME })}`,
+  //       subtitle: [], // TODO: come up with some subtitle text here
+  //     }
+  //   );
+  // }
 
   const goToIndex = (index: number) => {
     const newStep = steps[index];
@@ -80,8 +105,16 @@ const OnboardingPage = (props: IOnboardingPageProps) => {
 
   return (
     <div
-      className="dark:bg-brand dark:text-brand-contrast min-h-screen text-black"
+      className="dark:bg-brand dark:text-brand-contrast text-emphasis min-h-screen"
       data-testid="onboarding"
+      style={
+        {
+          "--cal-brand": "#111827",
+          "--cal-brand-emphasis": "#101010",
+          "--cal-brand-text": "white",
+          "--cal-brand-subtle": "#9CA3AF",
+        } as CSSProperties
+      }
       key={router.asPath}>
       <Head>
         <title>
@@ -100,7 +133,7 @@ const OnboardingPage = (props: IOnboardingPageProps) => {
                 </p>
 
                 {headers[currentStepIndex]?.subtitle.map((subtitle, index) => (
-                  <p className="font-sans text-sm font-normal text-gray-500" key={index}>
+                  <p className="text-subtle font-sans text-sm font-normal" key={index}>
                     {subtitle}
                   </p>
                 ))}
@@ -112,12 +145,15 @@ const OnboardingPage = (props: IOnboardingPageProps) => {
 
               {currentStep === "connected-calendar" && <ConnectedCalendars nextStep={() => goToIndex(2)} />}
 
+              {currentStep === "connected-video" && <ConnectedVideoStep nextStep={() => goToIndex(3)} />}
+
               {currentStep === "setup-availability" && (
-                <SetupAvailability nextStep={() => goToIndex(3)} defaultScheduleId={user.defaultScheduleId} />
+                <SetupAvailability nextStep={() => goToIndex(4)} defaultScheduleId={user.defaultScheduleId} />
               )}
 
               {currentStep === "user-profile" && <UserProfile user={user} />}
             </StepCard>
+
             {headers[currentStepIndex]?.skipText && (
               <div className="flex w-full flex-row justify-center">
                 <Button
@@ -171,6 +207,18 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       allowDynamicBooking: true,
       defaultScheduleId: true,
       completedOnboarding: true,
+      teams: {
+        select: {
+          accepted: true,
+          team: {
+            select: {
+              id: true,
+              name: true,
+              logo: true,
+            },
+          },
+        },
+      },
     },
   });
 
@@ -189,8 +237,12 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         ...user,
         emailMd5: crypto.createHash("md5").update(user.email).digest("hex"),
       },
+      hasPendingInvites: user.teams.find((team) => team.accepted === false) ?? false,
     },
   };
 };
+
+OnboardingPage.isThemeSupported = false;
+OnboardingPage.PageWrapper = PageWrapper;
 
 export default OnboardingPage;

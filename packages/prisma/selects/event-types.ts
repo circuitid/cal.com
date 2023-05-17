@@ -56,6 +56,7 @@ export const bookEventTypeSelect = Prisma.validator<Prisma.EventTypeSelect>()({
       theme: true,
     },
   },
+  successRedirectUrl: true,
 });
 
 export const availiblityPageEventTypeSelect = Prisma.validator<Prisma.EventTypeSelect>()({
@@ -64,6 +65,7 @@ export const availiblityPageEventTypeSelect = Prisma.validator<Prisma.EventTypeS
   availability: true,
   description: true,
   length: true,
+  offsetStart: true,
   price: true,
   currency: true,
   periodType: true,

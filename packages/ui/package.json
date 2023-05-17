@@ -1,5 +1,6 @@
 {
   "name": "@calcom/ui",
+  "private": true,
   "sideEffects": false,
   "version": "0.0.0",
   "main": "./index.tsx",
@@ -12,6 +13,7 @@
   "scripts": {
     "lint": "eslint .",
     "type-check": "tsc --pretty --noEmit",
+    "type-check:ci": "tsc-absolute --pretty --noEmit",
     "lint:fix": "eslint . --fix",
     "lint:report": "eslint . --format json --output-file ../../lint-results/ui.json"
   },
@@ -34,7 +36,7 @@
     "react-feather": "^2.0.10",
     "react-hook-form": "^7.43.3",
     "react-icons": "^4.4.0",
-    "react-select": "^5.4.0"
+    "react-select": "^5.7.0"
   },
   "devDependencies": {
     "@calcom/config": "*",

@@ -1,6 +1,5 @@
 import type { DestinationCalendar, Booking } from "@prisma/client";
-import { cloneDeep } from "lodash";
-import merge from "lodash/merge";
+import { cloneDeep, merge } from "lodash";
 import { v5 as uuidv5 } from "uuid";
 import type { z } from "zod";
 
@@ -11,15 +10,12 @@ import { MeetLocationType } from "@calcom/app-store/locations";
 import getApps from "@calcom/app-store/utils";
 import prisma from "@calcom/prisma";
 import { createdEventSchema } from "@calcom/prisma/zod-utils";
-import type { AdditionalInformation, CalendarEvent, NewCalendarEventType } from "@calcom/types/Calendar";
+import type { NewCalendarEventType } from "@calcom/types/Calendar";
+import type { AdditionalInformation, CalendarEvent } from "@calcom/types/Calendar";
 import type { CredentialPayload, CredentialWithAppName } from "@calcom/types/Credential";
 import type { Event } from "@calcom/types/Event";
-import type {
-  CreateUpdateResult,
-  EventResult,
-  PartialBooking,
-  PartialReference,
-} from "@calcom/types/EventManager";
+import type { EventResult } from "@calcom/types/EventManager";
+import type { CreateUpdateResult, PartialBooking, PartialReference } from "@calcom/types/EventManager";
 
 import { createEvent, updateEvent } from "./CalendarManager";
 import { createMeeting, updateMeeting } from "./videoClient";
@@ -126,10 +122,22 @@ export default class EventManager {
     // Create the calendar event with the proper video call data
     results.push(...(await this.createAllCalendarEvents(clonedCalEvent)));
 
+    // Since the result can be a new calendar event or video event, we have to create a type guard
+    // https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates
+    const isCalendarResult = (
+      result: (typeof results)[number]
+    ): result is EventResult<NewCalendarEventType> => {
+      return result.type.includes("_calendar");
+    };
+
     const referencesToCreate = results.map((result) => {
       let createdEventObj: createdEventSchema | null = null;
       if (typeof result?.createdEvent === "string") {
         createdEventObj = createdEventSchema.parse(JSON.parse(result.createdEvent));
+      }
+
+      if (isCalendarResult(result)) {
+        evt.iCalUID = result.iCalUID || undefined;
       }
 
       return {
@@ -439,20 +447,17 @@ export default class EventManager {
         });
       }
 
-      if (newBooking) {
-        calendarReference = newBooking.references.find((reference) => reference.type.includes("_calendar"));
-      } else {
-        // Bookings should only have one calendar reference
-        calendarReference = booking.references.find((reference) => reference.type.includes("_calendar"));
-      }
+      calendarReference = newBooking?.references.length
+        ? newBooking.references.find((reference) => reference.type.includes("_calendar"))
+        : booking.references.find((reference) => reference.type.includes("_calendar"));
 
       if (!calendarReference) {
         return [];
       }
       const { uid: bookingRefUid, externalCalendarId: bookingExternalCalendarId } = calendarReference;
-
-      if (!bookingExternalCalendarId) {
-        throw new Error("externalCalendarId");
+      let calenderExternalId: string | null = null;
+      if (bookingExternalCalendarId) {
+        calenderExternalId = bookingExternalCalendarId;
       }
 
       let result = [];
@@ -460,13 +465,13 @@ export default class EventManager {
         credential = this.calendarCredentials.filter(
           (credential) => credential.id === calendarReference?.credentialId
         )[0];
-        result.push(updateEvent(credential, event, bookingRefUid, bookingExternalCalendarId));
+        result.push(updateEvent(credential, event, bookingRefUid, calenderExternalId));
       } else {
         const credentials = this.calendarCredentials.filter(
           (credential) => credential.type === calendarReference?.type
         );
         for (const credential of credentials) {
-          result.push(updateEvent(credential, event, bookingRefUid, bookingExternalCalendarId));
+          result.push(updateEvent(credential, event, bookingRefUid, calenderExternalId));
         }
       }
 
@@ -480,8 +485,7 @@ export default class EventManager {
               id: oldCalendarEvent.credentialId,
             },
           });
-          const calendar = getCalendar(calendarCredential);
-
+          const calendar = await getCalendar(calendarCredential);
           await calendar?.deleteEvent(oldCalendarEvent.uid, event, oldCalendarEvent.externalCalendarId);
         }
       }

@@ -3,7 +3,7 @@ import dayjs from "@calcom/dayjs";
 import type { WorkingHours, TimeRange as DateOverride } from "@calcom/types/schedule";
 
 import { getWorkingHours } from "./availability";
-import { getTimeZone, isInDST, getDSTDifference } from "./date-fns";
+import { getTimeZone } from "./date-fns";
 
 export type GetSlots = {
   inviteeDate: Dayjs;
@@ -12,17 +12,20 @@ export type GetSlots = {
   dateOverrides?: DateOverride[];
   minimumBookingNotice: number;
   eventLength: number;
+  offsetStart: number;
   organizerTimeZone: string;
 };
 export type TimeFrame = { userIds?: number[]; startTime: number; endTime: number };
 
 const minimumOfOne = (input: number) => (input < 1 ? 1 : input);
+const minimumOfZero = (input: number) => (input < 0 ? 0 : input);
 
 function buildSlots({
   startOfInviteeDay,
   computedLocalAvailability,
   frequency,
   eventLength,
+  offsetStart,
   startDate,
   organizerTimeZone,
   inviteeTimeZone,
@@ -32,6 +35,7 @@ function buildSlots({
   startDate: Dayjs;
   frequency: number;
   eventLength: number;
+  offsetStart: number;
   organizerTimeZone: string;
   inviteeTimeZone: string;
 }) {
@@ -42,6 +46,8 @@ function buildSlots({
   // keep the old safeguards in; may be needed.
   frequency = minimumOfOne(frequency);
   eventLength = minimumOfOne(eventLength);
+  offsetStart = minimumOfZero(offsetStart);
+
   // A day starts at 00:00 unless the startDate is the same as the current day
   const dayStart = startOfInviteeDay.isSame(startDate, "day")
     ? Math.ceil((startDate.hour() * 60 + startDate.minute()) / frequency) * frequency
@@ -84,10 +90,14 @@ function buildSlots({
 
   for (const [boundaryStart, boundaryEnd] of ranges) {
     // loop through the day, based on frequency.
-    for (let slotStart = boundaryStart; slotStart < boundaryEnd; slotStart += frequency) {
+    for (
+      let slotStart = boundaryStart + offsetStart;
+      slotStart < boundaryEnd;
+      slotStart += offsetStart + frequency
+    ) {
       computedLocalAvailability.forEach((item) => {
         // TODO: This logic does not allow for past-midnight bookings.
-        if (slotStart < item.startTime || slotStart > item.endTime + 15 - eventLength) {
+        if (slotStart < item.startTime || slotStart > item.endTime + 1 - eventLength) {
           return;
         }
         slotsTimeFrameAvailable[slotStart.toString()] = {
@@ -99,15 +109,13 @@ function buildSlots({
     }
   }
 
-  const isOrganizerInDST = isInDST(startOfInviteeDay.tz(organizerTimeZone));
-  const isInviteeInDST = isInDST(startOfInviteeDay.tz(inviteeTimeZone));
-  const organizerDSTDifference = getDSTDifference(organizerTimeZone);
-  const inviteeDSTDifference = getDSTDifference(inviteeTimeZone);
-
+  const organizerDSTDiff =
+    dayjs().tz(organizerTimeZone).utcOffset() - startOfInviteeDay.tz(organizerTimeZone).utcOffset();
+  const inviteeDSTDiff =
+    dayjs().tz(inviteeTimeZone).utcOffset() - startOfInviteeDay.tz(inviteeTimeZone).utcOffset();
   const slots: { time: Dayjs; userIds?: number[] }[] = [];
-  const resultDSTDifference = isOrganizerInDST ? organizerDSTDifference : -inviteeDSTDifference;
   const getTime = (time: number) => {
-    const minutes = isOrganizerInDST !== isInviteeInDST ? time - resultDSTDifference : time;
+    const minutes = time + organizerDSTDiff - inviteeDSTDiff;
 
     return startOfInviteeDay.tz(inviteeTimeZone).add(minutes, "minutes");
   };
@@ -141,6 +149,7 @@ const getSlots = ({
   workingHours,
   dateOverrides = [],
   eventLength,
+  offsetStart,
   organizerTimeZone,
 }: GetSlots) => {
   // current date in invitee tz
@@ -152,7 +161,7 @@ const getSlots = ({
   // checks if the start date is in the past
 
   /**
-   *  TODO: change "day" for "hour" to stop displaying 1 day before today
+   * TODO: change "day" for "hour" to stop displaying 1 day before today
    * This is displaying a day as available as sometimes difference between two dates is < 24 hrs.
    * But when doing timezones an available day for an owner can be 2 days available in other users tz.
    *
@@ -242,6 +251,7 @@ const getSlots = ({
     startDate,
     frequency,
     eventLength,
+    offsetStart,
     organizerTimeZone,
     inviteeTimeZone: timeZone,
   });

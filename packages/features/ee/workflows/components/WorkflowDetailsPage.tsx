@@ -1,5 +1,3 @@
-import type { WorkflowActions } from "@prisma/client";
-import { WorkflowTemplates } from "@prisma/client";
 import { useRouter } from "next/router";
 import type { Dispatch, SetStateAction } from "react";
 import { useMemo, useState } from "react";
@@ -8,12 +6,14 @@ import { Controller } from "react-hook-form";
 
 import { SENDER_ID, SENDER_NAME } from "@calcom/lib/constants";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
+import { WorkflowTemplates } from "@calcom/prisma/enums";
+import type { WorkflowActions } from "@calcom/prisma/enums";
 import { trpc } from "@calcom/trpc/react";
 import type { MultiSelectCheckboxesOptionType as Option } from "@calcom/ui";
 import { Button, Label, MultiSelectCheckboxes, TextField } from "@calcom/ui";
-import { FiArrowDown, FiTrash2 } from "@calcom/ui/components/icon";
+import { ArrowDown, Trash2 } from "@calcom/ui/components/icon";
 
-import { isSMSAction } from "../lib/isSMSAction";
+import { isSMSAction } from "../lib/actionHelperFunctions";
 import type { FormValues } from "../pages/workflow";
 import { AddActionDialog } from "./AddActionDialog";
 import { DeleteDialog } from "./DeleteDialog";
@@ -26,6 +26,7 @@ interface Props {
   setSelectedEventTypes: Dispatch<SetStateAction<Option[]>>;
   teamId?: number;
   isMixedEventType: boolean;
+  readOnly: boolean;
 }
 
 export default function WorkflowDetailsPage(props: Props) {
@@ -50,7 +51,7 @@ export default function WorkflowDetailsPage(props: Props) {
           ...options,
           ...group.eventTypes.map((eventType) => ({
             value: String(eventType.id),
-            label: eventType.title,
+            label: `${eventType.title} ${eventType.children.length ? `(+${eventType.children.length})` : ``}`,
           })),
         ];
       }, [] as Option[]) || [],
@@ -112,7 +113,12 @@ export default function WorkflowDetailsPage(props: Props) {
       <div className="my-8 sm:my-0 md:flex">
         <div className="pl-2 pr-3 md:sticky md:top-6 md:h-0 md:pl-0">
           <div className="mb-5">
-            <TextField label={`${t("workflow_name")}:`} type="text" {...form.register("name")} />
+            <TextField
+              disabled={props.readOnly}
+              label={`${t("workflow_name")}:`}
+              type="text"
+              {...form.register("name")}
+            />
           </div>
           <Label>{t("which_event_type_apply")}</Label>
           <Controller
@@ -122,6 +128,7 @@ export default function WorkflowDetailsPage(props: Props) {
               return (
                 <MultiSelectCheckboxes
                   options={allEventTypeOptions}
+                  isDisabled={props.readOnly}
                   isLoading={isLoading}
                   className="w-full md:w-64"
                   setSelected={setSelectedEventTypes}
@@ -133,23 +140,25 @@ export default function WorkflowDetailsPage(props: Props) {
               );
             }}
           />
-          <div className="my-7 border-transparent md:border-t md:border-gray-200" />
-          <Button
-            type="button"
-            StartIcon={FiTrash2}
-            color="destructive"
-            className="border"
-            onClick={() => setDeleteDialogOpen(true)}>
-            {t("delete_workflow")}
-          </Button>
-          <div className="my-7 border-t border-gray-200 md:border-none" />
+          <div className="md:border-subtle my-7 border-transparent md:border-t" />
+          {!props.readOnly && (
+            <Button
+              type="button"
+              StartIcon={Trash2}
+              color="destructive"
+              className="border"
+              onClick={() => setDeleteDialogOpen(true)}>
+              {t("delete_workflow")}
+            </Button>
+          )}
+          <div className="border-subtle my-7 border-t md:border-none" />
         </div>
 
         {/* Workflow Trigger Event & Steps */}
-        <div className="w-full rounded-md border border-gray-200 bg-gray-50 p-3 py-5 md:ml-3 md:p-8">
+        <div className="bg-muted border-subtle w-full rounded-md border p-3 py-5 md:ml-3 md:p-8">
           {form.getValues("trigger") && (
             <div>
-              <WorkflowStepContainer form={form} teamId={teamId} />
+              <WorkflowStepContainer form={form} teamId={teamId} readOnly={props.readOnly} />
             </div>
           )}
           {form.getValues("steps") && (
@@ -163,23 +172,28 @@ export default function WorkflowDetailsPage(props: Props) {
                     reload={reload}
                     setReload={setReload}
                     teamId={teamId}
+                    readOnly={props.readOnly}
                   />
                 );
               })}
             </>
           )}
-          <div className="my-3 flex justify-center">
-            <FiArrowDown className="stroke-[1.5px] text-3xl text-gray-500" />
-          </div>
-          <div className="flex justify-center">
-            <Button
-              type="button"
-              onClick={() => setIsAddActionDialogOpen(true)}
-              color="secondary"
-              className="bg-white">
-              {t("add_action")}
-            </Button>
-          </div>
+          {!props.readOnly && (
+            <>
+              <div className="my-3 flex justify-center">
+                <ArrowDown className="text-subtle stroke-[1.5px] text-3xl" />
+              </div>
+              <div className="flex justify-center">
+                <Button
+                  type="button"
+                  onClick={() => setIsAddActionDialogOpen(true)}
+                  color="secondary"
+                  className="bg-default">
+                  {t("add_action")}
+                </Button>
+              </div>
+            </>
+          )}
         </div>
       </div>
       <AddActionDialog

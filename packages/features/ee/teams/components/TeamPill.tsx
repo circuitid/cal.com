@@ -1,7 +1,7 @@
-import { MembershipRole } from "@prisma/client";
 import classNames from "classnames";
 
 import { useLocale } from "@calcom/lib/hooks/useLocale";
+import { MembershipRole } from "@calcom/prisma/enums";
 
 type PillColor = "blue" | "green" | "red" | "orange";
 
@@ -14,10 +14,10 @@ export default function TeamPill(props: Props) {
   return (
     <div
       className={classNames("text-medium self-center rounded-md px-1 py-0.5 text-xs ltr:mr-1 rtl:ml-1", {
-        " bg-gray-100 text-gray-800": !props.color,
-        " bg-blue-100 text-blue-800": props.color === "blue",
-        " bg-red-100 text-red-800 ": props.color === "red",
-        " bg-orange-100 text-orange-800": props.color === "orange",
+        " bg-subtle text-emphasis": !props.color,
+        " bg-info text-blue-800": props.color === "blue",
+        " bg-error text-red-800 ": props.color === "red",
+        " bg-attention text-orange-800": props.color === "orange",
       })}>
       {props.text}
     </div>

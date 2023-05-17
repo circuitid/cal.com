@@ -1,8 +1,8 @@
-import { CheckCircleIcon, ExclamationIcon, InformationCircleIcon, XCircleIcon } from "@heroicons/react/solid";
 import classNames from "classnames";
 import type { ReactNode } from "react";
+import { forwardRef } from "react";
 
-import { FiInfo } from "../icon";
+import { CheckCircle2, Info, XCircle, AlertTriangle } from "@calcom/ui/components/icon";
 
 export interface AlertProps {
   title?: ReactNode;
@@ -15,43 +15,50 @@ export interface AlertProps {
   // @TODO: Success and info shouldn't exist as per design?
   severity: "success" | "warning" | "error" | "info" | "neutral";
 }
-export function Alert(props: AlertProps) {
+export const Alert = forwardRef<HTMLDivElement, AlertProps>((props, ref) => {
   const { severity, iconClassName } = props;
 
   return (
     <div
+      ref={ref}
       className={classNames(
         "rounded-md border border-opacity-20 p-3",
         props.className,
         severity === "error" && "border-red-900 bg-red-50 text-red-800",
         severity === "warning" && "border-yellow-700 bg-yellow-50 text-yellow-700",
         severity === "info" && "border-sky-700 bg-sky-50 text-sky-700",
-        severity === "success" && "bg-gray-900 text-white",
-        severity === "neutral" && "border-none bg-gray-100"
+        severity === "success" && "bg-inverted text-inverted",
+        severity === "neutral" && "bg-subtle text-default border-none"
       )}>
       <div className="relative flex flex-col md:flex-row">
         <div className="flex-shrink-0">
           {severity === "error" && (
-            <XCircleIcon className={classNames("h-5 w-5 text-red-400", iconClassName)} aria-hidden="true" />
+            <XCircle
+              className={classNames("h-5 w-5 fill-red-400 text-white", iconClassName)}
+              aria-hidden="true"
+            />
           )}
           {severity === "warning" && (
-            <ExclamationIcon
-              className={classNames("h-5 w-5 text-yellow-400", iconClassName)}
+            <AlertTriangle
+              className={classNames("h-5 w-5 fill-yellow-400 text-white", iconClassName)}
               aria-hidden="true"
             />
           )}
           {severity === "info" && (
-            <InformationCircleIcon
-              className={classNames("h-5 w-5 text-sky-400", iconClassName)}
+            <Info
+              className={classNames("h-5 w-5 fill-sky-400 text-white", iconClassName)}
               aria-hidden="true"
             />
           )}
           {severity === "neutral" && (
-            <FiInfo className={classNames("h-5 w-5 text-gray-800", iconClassName)} aria-hidden="true" />
+            <Info
+              className={classNames("text-default h-5 w-5 fill-transparent", iconClassName)}
+              aria-hidden="true"
+            />
           )}
           {severity === "success" && (
-            <CheckCircleIcon
-              className={classNames("h-5 w-5 text-gray-400", iconClassName)}
+            <CheckCircle2
+              className={classNames("fill-muted h-5 w-5 text-white", iconClassName)}
               aria-hidden="true"
             />
           )}
@@ -65,4 +72,6 @@ export function Alert(props: AlertProps) {
       </div>
     </div>
   );
-}
+});
+
+Alert.displayName = "Alert";

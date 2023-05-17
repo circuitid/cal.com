@@ -1,12 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { WorkflowStep } from "@prisma/client";
-import {
-  TimeUnit,
-  WorkflowActions,
-  WorkflowTemplates,
-  WorkflowTriggerEvents,
-  MembershipRole,
-} from "@prisma/client";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -19,15 +12,17 @@ import { classNames } from "@calcom/lib";
 import { SENDER_ID } from "@calcom/lib/constants";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { HttpError } from "@calcom/lib/http-error";
+import { TimeUnit, WorkflowActions, WorkflowTemplates } from "@calcom/prisma/enums";
+import { WorkflowTriggerEvents, MembershipRole } from "@calcom/prisma/enums";
 import { stringOrNumber } from "@calcom/prisma/zod-utils";
 import { trpc } from "@calcom/trpc/react";
 import type { MultiSelectCheckboxesOptionType as Option } from "@calcom/ui";
 import { Alert, Button, Form, showToast, Badge } from "@calcom/ui";
 
-import LicenseRequired from "../../common/components/v2/LicenseRequired";
+import LicenseRequired from "../../common/components/LicenseRequired";
 import SkeletonLoader from "../components/SkeletonLoaderEdit";
 import WorkflowDetailsPage from "../components/WorkflowDetailsPage";
-import { isSMSAction } from "../lib/isSMSAction";
+import { isSMSAction } from "../lib/actionHelperFunctions";
 import { getTranslatedText, translateVariablesToEnglish } from "../lib/variableTranslations";
 
 export type FormValues = {
@@ -127,10 +122,13 @@ function WorkflowPage() {
         setIsMixedEventType(true);
       }
       setSelectedEventTypes(
-        workflow.activeOn.map((active) => ({
-          value: String(active.eventType.id),
-          label: active.eventType.title,
-        })) || []
+        workflow.activeOn.flatMap((active) => {
+          if (workflow.teamId && active.eventType.parentId) return [];
+          return {
+            value: String(active.eventType.id),
+            label: active.eventType.title,
+          };
+        }) || []
       );
       const activeOn = workflow.activeOn
         ? workflow.activeOn.map((active) => ({
@@ -204,10 +202,7 @@ function WorkflowPage() {
         values.steps.forEach((step) => {
           const strippedHtml = step.reminderBody?.replace(/<[^>]+>/g, "") || "";
 
-          const isBodyEmpty =
-            step.template === WorkflowTemplates.CUSTOM &&
-            !isSMSAction(step.action) &&
-            strippedHtml.length <= 1;
+          const isBodyEmpty = !isSMSAction(step.action) && strippedHtml.length <= 1;
 
           if (isBodyEmpty) {
             form.setError(`steps.${step.stepNumber - 1}.reminderBody`, {
@@ -260,22 +255,28 @@ function WorkflowPage() {
         backPath="/workflows"
         title={workflow && workflow.name ? workflow.name : "Untitled"}
         CTA={
-          <div>
-            <Button type="submit" disabled={readOnly}>
-              {t("save")}
-            </Button>
-          </div>
+          !readOnly && (
+            <div>
+              <Button type="submit">{t("save")}</Button>
+            </div>
+          )
         }
+        hideHeadingOnMobile
         heading={
           session.data?.hasValidLicense &&
           isAllDataLoaded && (
             <div className="flex">
-              <div className={classNames(workflow && !workflow.name ? "text-gray-400" : "")}>
+              <div className={classNames(workflow && !workflow.name ? "text-muted" : "")}>
                 {workflow && workflow.name ? workflow.name : "untitled"}
               </div>
               {workflow && workflow.team && (
                 <Badge className="mt-1 ml-4" variant="gray">
                   {workflow.team.slug}
+                </Badge>
+              )}
+              {readOnly && (
+                <Badge className="mt-1 ml-4" variant="gray">
+                  {t("readonly")}
                 </Badge>
               )}
             </div>
@@ -293,6 +294,7 @@ function WorkflowPage() {
                     setSelectedEventTypes={setSelectedEventTypes}
                     teamId={workflow ? workflow.teamId || undefined : undefined}
                     isMixedEventType={isMixedEventType}
+                    readOnly={readOnly}
                   />
                 </>
               ) : (

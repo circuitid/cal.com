@@ -5,6 +5,7 @@ import { getCsrfToken, signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState, useEffect, useCallback } from "react";
+import type { CSSProperties } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { FaGoogle } from "react-icons/fa";
 
@@ -18,14 +19,14 @@ import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { collectPageParameters, telemetryEventTypes, useTelemetry } from "@calcom/lib/telemetry";
 import prisma from "@calcom/prisma";
 import { Alert, Button, EmailField, PasswordField } from "@calcom/ui";
-import { FiArrowLeft } from "@calcom/ui/components/icon";
-import { FiInfo } from "@calcom/ui/components/icon";
+import { ArrowLeft, Info } from "@calcom/ui/components/icon";
 
 import type { inferSSRProps } from "@lib/types/inferSSRProps";
 import type { WithNonceProps } from "@lib/withNonce";
 import withNonce from "@lib/withNonce";
 
 import AddToHomescreen from "@components/AddToHomescreen";
+import PageWrapper from "@components/PageWrapper";
 import TwoFactor from "@components/auth/TwoFactor";
 import AuthContainer from "@components/ui/AuthContainer";
 
@@ -93,7 +94,7 @@ export default function Login({
         setTwoFactorRequired(false);
         methods.setValue("totpCode", "");
       }}
-      StartIcon={FiArrowLeft}
+      StartIcon={ArrowLeft}
       color="minimal">
       {t("go_back")}
     </Button>
@@ -190,6 +191,14 @@ export default function Login({
                     hidden
                     {...register("csrfToken")}
                   />
+                  <div className="absolute -top-1.5 ltr:right-0 rtl:left-0">
+                    <Link
+                      href="/auth/forgot-password"
+                      tabIndex={-1}
+                      className="text-default text-sm font-medium">
+                      {t("forgot")}
+                    </Link>
+                  </div>
                 </div>
                 <div className="space-y-6">
                   <div className={classNames("space-y-6", { hidden: twoFactorRequired })}>
@@ -376,5 +385,8 @@ const _getServerSideProps = async function getServerSideProps(context: GetServer
     },
   };
 };
+
+Login.isThemeSupported = false;
+Login.PageWrapper = PageWrapper;
 
 export const getServerSideProps = withNonce(_getServerSideProps);

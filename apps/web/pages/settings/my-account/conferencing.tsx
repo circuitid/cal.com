@@ -24,19 +24,32 @@ import {
   SkeletonContainer,
   SkeletonText,
 } from "@calcom/ui";
-import { FiAlertCircle, FiMoreHorizontal, FiTrash, FiVideo } from "@calcom/ui/components/icon";
+import { AlertCircle, MoreHorizontal, Trash, Video, Plus } from "@calcom/ui/components/icon";
 
 import AppListCard from "@components/AppListCard";
+import PageWrapper from "@components/PageWrapper";
 
 const SkeletonLoader = ({ title, description }: { title: string; description: string }) => {
   return (
     <SkeletonContainer>
       <Meta title={title} description={description} />
-      <div className="mt-6 mb-8 space-y-6 divide-y">
+      <div className="divide-subtle mt-6 mb-8 space-y-6">
         <SkeletonText className="h-8 w-full" />
         <SkeletonText className="h-8 w-full" />
       </div>
     </SkeletonContainer>
+  );
+};
+
+const AddConferencingButton = () => {
+  const { t } = useLocale();
+
+  return (
+    <>
+      <Button color="secondary" StartIcon={Plus} href="/apps/categories/video">
+        {t("add_conferencing_app")}
+      </Button>
+    </>
   );
 };
 
@@ -89,8 +102,12 @@ const ConferencingLayout = () => {
     return <SkeletonLoader title={t("conferencing")} description={t("conferencing_description")} />;
 
   return (
-    <div className="w-full bg-white sm:mx-0 xl:mt-0">
-      <Meta title={t("conferencing")} description={t("conferencing_description")} />
+    <div className="bg-default w-full sm:mx-0 xl:mt-0">
+      <Meta
+        title={t("conferencing")}
+        description={t("conferencing_description")}
+        CTA={<AddConferencingButton />}
+      />
       <List>
         {apps?.items &&
           apps.items
@@ -111,7 +128,7 @@ const ConferencingLayout = () => {
                     <div>
                       <Dropdown>
                         <DropdownMenuTrigger asChild>
-                          <Button StartIcon={FiMoreHorizontal} variant="icon" color="secondary" />
+                          <Button StartIcon={MoreHorizontal} variant="icon" color="secondary" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                           {!appIsDefault && (
@@ -119,7 +136,7 @@ const ConferencingLayout = () => {
                               <DropdownItem
                                 type="button"
                                 color="secondary"
-                                StartIcon={FiVideo}
+                                StartIcon={Video}
                                 onClick={() => {
                                   const locationType = getEventLocationTypeFromApp(
                                     app?.locationOption?.value ?? ""
@@ -141,7 +158,7 @@ const ConferencingLayout = () => {
                               type="button"
                               color="destructive"
                               disabled={app.isGlobal}
-                              StartIcon={FiTrash}
+                              StartIcon={Trash}
                               onClick={() => {
                                 setDeleteCredentialId(app.credentialIds[0]);
                                 setDeleteAppModal(true);
@@ -163,7 +180,7 @@ const ConferencingLayout = () => {
           title={t("Remove app")}
           description={t("are_you_sure_you_want_to_remove_this_app")}
           type="confirmation"
-          Icon={FiAlertCircle}>
+          Icon={AlertCircle}>
           <DialogFooter>
             <Button color="primary" onClick={() => deleteAppMutation.mutate({ id: deleteCredentialId })}>
               {t("yes_remove_app")}
@@ -188,5 +205,6 @@ const ConferencingLayout = () => {
 };
 
 ConferencingLayout.getLayout = getLayout;
+ConferencingLayout.PageWrapper = PageWrapper;
 
 export default ConferencingLayout;

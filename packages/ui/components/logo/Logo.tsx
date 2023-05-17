@@ -1,17 +1,27 @@
-import { LOGO_ICON, LOGO } from "@calcom/lib/constants";
+import classNames from "@calcom/lib/classNames";
 
-export default function Logo({ small, icon }: { small?: boolean; icon?: boolean }) {
+export default function Logo({
+  small,
+  icon,
+  inline = true,
+  className,
+}: {
+  small?: boolean;
+  icon?: boolean;
+  inline?: boolean;
+  className?: string;
+}) {
   return (
-    <h3 className="logo inline">
+    <h3 className={classNames("logo", inline && "inline", className)}>
       <strong>
         {icon ? (
-          <img className="mx-auto w-9" alt="Circuit ID" title="Circuit ID" src={LOGO_ICON} />
+          <img className="mx-auto w-9 dark:invert" alt="Circuit ID" title="Circuit ID" src="/api/logo?icon=1" />
         ) : (
           <img
-            className={small ? "h-4 w-auto" : "h-5 w-auto"}
+            className={classNames(small ? "h-4 w-auto" : "h-5 w-auto", "dark:invert")}
             alt="Circuit ID"
             title="Circuit ID"
-            src={LOGO}
+            src="/api/logo"
           />
         )}
       </strong>

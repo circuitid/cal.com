@@ -1,5 +1,4 @@
-import type { WebhookTriggerEvents, WorkflowReminder } from "@prisma/client";
-import { BookingStatus, MembershipRole, WorkflowMethods } from "@prisma/client";
+import type { Prisma, WebhookTriggerEvents, WorkflowReminder } from "@prisma/client";
 import type { NextApiRequest } from "next";
 
 import appStore from "@calcom/app-store";
@@ -10,6 +9,7 @@ import { cancelScheduledJobs } from "@calcom/app-store/zapier/lib/nodeScheduler"
 import { deleteMeeting, updateMeeting } from "@calcom/core/videoClient";
 import dayjs from "@calcom/dayjs";
 import { sendCancelledEmails, sendCancelledSeatEmails } from "@calcom/emails";
+import { getCalEventResponses } from "@calcom/features/bookings/lib/getCalEventResponses";
 import { deleteScheduledEmailReminder } from "@calcom/features/ee/workflows/lib/reminders/emailReminderManager";
 import { sendCancelledReminders } from "@calcom/features/ee/workflows/lib/reminders/reminderScheduler";
 import { deleteScheduledSMSReminder } from "@calcom/features/ee/workflows/lib/reminders/smsReminderManager";
@@ -18,11 +18,14 @@ import type { EventTypeInfo } from "@calcom/features/webhooks/lib/sendPayload";
 import sendPayload from "@calcom/features/webhooks/lib/sendPayload";
 import { isPrismaObjOrUndefined, parseRecurringEvent } from "@calcom/lib";
 import { HttpError } from "@calcom/lib/http-error";
+import logger from "@calcom/lib/logger";
 import { handleRefundError } from "@calcom/lib/payment/handleRefundError";
 import { getTranslation } from "@calcom/lib/server/i18n";
 import prisma, { bookingMinimalSelect } from "@calcom/prisma";
+import { BookingStatus, MembershipRole, WorkflowMethods } from "@calcom/prisma/enums";
 import { schemaBookingCancelParams } from "@calcom/prisma/zod-utils";
 import type { CalendarEvent } from "@calcom/types/Calendar";
+import type { IAbstractPaymentService } from "@calcom/types/PaymentService";
 
 async function getBookingToDelete(id: number | undefined, uid: string | undefined) {
   return await prisma.booking.findUnique({
@@ -37,7 +40,7 @@ async function getBookingToDelete(id: number | undefined, uid: string | undefine
       user: {
         select: {
           id: true,
-          credentials: true,
+          credentials: true, // Not leaking at the moment, be careful with
           email: true,
           timeZone: true,
           name: true,
@@ -57,6 +60,7 @@ async function getBookingToDelete(id: number | undefined, uid: string | undefine
       paid: true,
       eventType: {
         select: {
+          slug: true,
           owner: true,
           teamId: true,
           recurringEvent: true,
@@ -67,6 +71,8 @@ async function getBookingToDelete(id: number | undefined, uid: string | undefine
           currency: true,
           length: true,
           seatsPerTimeSlot: true,
+          bookingFields: true,
+          seatsShowAttendees: true,
           hosts: {
             select: {
               user: true,
@@ -90,6 +96,7 @@ async function getBookingToDelete(id: number | undefined, uid: string | undefine
       workflowReminders: true,
       scheduledJobs: true,
       seatsReferences: true,
+      responses: true,
     },
   });
 }
@@ -172,6 +179,10 @@ async function handler(req: CustomRequest) {
     type: (bookingToDelete?.eventType?.title as string) || bookingToDelete?.title,
     description: bookingToDelete?.description || "",
     customInputs: isPrismaObjOrUndefined(bookingToDelete.customInputs),
+    ...getCalEventResponses({
+      bookingFields: bookingToDelete.eventType?.bookingFields ?? null,
+      booking: bookingToDelete,
+    }),
     startTime: bookingToDelete?.startTime ? dayjs(bookingToDelete.startTime).format() : "",
     endTime: bookingToDelete?.endTime ? dayjs(bookingToDelete.endTime).format() : "",
     organizer: {
@@ -190,6 +201,8 @@ async function handler(req: CustomRequest) {
     destinationCalendar: bookingToDelete?.destinationCalendar || bookingToDelete?.user.destinationCalendar,
     cancellationReason: cancellationReason,
     ...(teamMembers && { team: { name: "", members: teamMembers } }),
+    seatsPerTimeSlot: bookingToDelete.eventType?.seatsPerTimeSlot,
+    seatsShowAttendees: bookingToDelete.eventType?.seatsShowAttendees,
   };
 
   // If it's just an attendee of a booking then just remove them from that booking
@@ -230,7 +243,7 @@ async function handler(req: CustomRequest) {
               integrationsToDelete.push(deleteMeeting(credential, reference.uid));
             }
             if (reference.type.includes("_calendar")) {
-              const calendar = getCalendar(credential);
+              const calendar = await getCalendar(credential);
               if (calendar) {
                 integrationsToDelete.push(
                   calendar?.deleteEvent(reference.uid, evt, reference.externalCalendarId)
@@ -252,7 +265,7 @@ async function handler(req: CustomRequest) {
               );
             }
             if (reference.type.includes("_calendar")) {
-              const calendar = getCalendar(credential);
+              const calendar = await getCalendar(credential);
               if (calendar) {
                 integrationsToDelete.push(
                   calendar?.updateEvent(reference.uid, updatedEvt, reference.externalCalendarId)
@@ -266,9 +279,12 @@ async function handler(req: CustomRequest) {
 
     await Promise.all(integrationsToDelete).then(async () => {
       if (lastAttendee) {
-        await prisma.booking.delete({
+        await prisma.booking.update({
           where: {
             id: bookingToDelete.id,
+          },
+          data: {
+            status: BookingStatus.CANCELLED,
           },
         });
       }
@@ -318,11 +334,15 @@ async function handler(req: CustomRequest) {
 
   //Workflows - schedule reminders
   if (bookingToDelete.eventType?.workflows) {
-    await sendCancelledReminders(
-      bookingToDelete.eventType?.workflows,
-      bookingToDelete.smsReminderNumber,
-      evt
-    );
+    await sendCancelledReminders({
+      workflows: bookingToDelete.eventType?.workflows,
+      smsReminderNumber: bookingToDelete.smsReminderNumber,
+      evt: {
+        ...evt,
+        ...{ eventType: { slug: bookingToDelete.eventType.slug } },
+      },
+      hideBranding: !!bookingToDelete.eventType.owner?.hideBranding,
+    });
   }
 
   let updatedBookings: {
@@ -388,11 +408,11 @@ async function handler(req: CustomRequest) {
         },
       });
     }
+
+    const where: Prisma.BookingWhereUniqueInput = uid ? { uid } : { id };
+
     const updatedBooking = await prisma.booking.update({
-      where: {
-        id,
-        uid,
-      },
+      where,
       data: {
         status: BookingStatus.CANCELLED,
         cancellationReason: cancellationReason,
@@ -436,7 +456,7 @@ async function handler(req: CustomRequest) {
         (credential) => credential.id === credentialId
       );
       if (calendarCredential) {
-        const calendar = getCalendar(calendarCredential);
+        const calendar = await getCalendar(calendarCredential);
         if (
           bookingToDelete.eventType?.recurringEvent &&
           bookingToDelete.recurringEventId &&
@@ -445,7 +465,7 @@ async function handler(req: CustomRequest) {
           bookingToDelete.user.credentials
             .filter((credential) => credential.type.endsWith("_calendar"))
             .forEach(async (credential) => {
-              const calendar = getCalendar(credential);
+              const calendar = await getCalendar(credential);
               for (const updBooking of updatedBookings) {
                 const bookingRef = updBooking.references.find((ref) => ref.type.includes("_calendar"));
                 if (bookingRef) {
@@ -461,12 +481,13 @@ async function handler(req: CustomRequest) {
       }
     } else {
       // For bookings made before the refactor we go through the old behaviour of running through each calendar credential
-      bookingToDelete.user.credentials
-        .filter((credential) => credential.type.endsWith("_calendar"))
-        .forEach((credential) => {
-          const calendar = getCalendar(credential);
-          apiDeletes.push(calendar?.deleteEvent(uid, evt, externalCalendarId) as Promise<unknown>);
-        });
+      const calendarCredentials = bookingToDelete.user.credentials.filter((credential) =>
+        credential.type.endsWith("_calendar")
+      );
+      for (const credential of calendarCredentials) {
+        const calendar = await getCalendar(credential);
+        apiDeletes.push(calendar?.deleteEvent(uid, evt, externalCalendarId) as Promise<unknown>);
+      }
     }
   }
 
@@ -483,6 +504,7 @@ async function handler(req: CustomRequest) {
       );
 
       if (videoCredential) {
+        logger.debug("videoCredential inside cancel booking handler", videoCredential);
         apiDeletes.push(deleteMeeting(videoCredential, uid));
       }
     }
@@ -491,7 +513,8 @@ async function handler(req: CustomRequest) {
     bookingToDelete.user.credentials
       .filter((credential) => credential.type.endsWith("_video"))
       .forEach((credential) => {
-        apiDeletes.push(deleteMeeting(credential, bookingToDelete.uid));
+        const uidToDelete = bookingToDelete?.references?.[0]?.uid ?? bookingToDelete.uid;
+        apiDeletes.push(deleteMeeting(credential, uidToDelete));
       });
   }
 
@@ -502,6 +525,10 @@ async function handler(req: CustomRequest) {
       title: bookingToDelete.title,
       description: bookingToDelete.description ?? "",
       customInputs: isPrismaObjOrUndefined(bookingToDelete.customInputs),
+      ...getCalEventResponses({
+        booking: bookingToDelete,
+        bookingFields: bookingToDelete.eventType?.bookingFields ?? null,
+      }),
       startTime: bookingToDelete.startTime.toISOString(),
       endTime: bookingToDelete.endTime.toISOString(),
       organizer: {
@@ -567,14 +594,16 @@ async function handler(req: CustomRequest) {
     }
 
     // Posible to refactor TODO:
-    const paymentApp = appStore[paymentAppCredential?.app?.dirName as keyof typeof appStore];
+    const paymentApp = await appStore[paymentAppCredential?.app?.dirName as keyof typeof appStore]();
     if (!(paymentApp && "lib" in paymentApp && "PaymentService" in paymentApp.lib)) {
       console.warn(`payment App service of type ${paymentApp} is not implemented`);
       return null;
     }
 
-    const PaymentService = paymentApp.lib.PaymentService;
-    const paymentInstance = new PaymentService(paymentAppCredential);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const PaymentService = paymentApp.lib.PaymentService as unknown as any;
+    const paymentInstance = new PaymentService(paymentAppCredential) as IAbstractPaymentService;
+
     try {
       await paymentInstance.refund(successPayment.id);
     } catch (error) {
