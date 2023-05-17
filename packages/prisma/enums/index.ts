@@ -56,8 +56,7 @@ export const EventTypeCustomInputType = {
   PHONE: "PHONE",
 } as const;
 
-export type EventTypeCustomInputType =
-  (typeof EventTypeCustomInputType)[keyof typeof EventTypeCustomInputType];
+export type EventTypeCustomInputType = (typeof EventTypeCustomInputType)[keyof typeof EventTypeCustomInputType];
 
 export const ReminderType = {
   PENDING_BOOKING_CONFIRMATION: "PENDING_BOOKING_CONFIRMATION",
