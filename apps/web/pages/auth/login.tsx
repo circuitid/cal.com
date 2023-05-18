@@ -317,7 +317,7 @@ const _getServerSideProps = async function getServerSideProps(context: GetServer
       };
     }
   }
-
+  
   let jwtPayload = null;
   if (context.query.jwt) {
     try {
