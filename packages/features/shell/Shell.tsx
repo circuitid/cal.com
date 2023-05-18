@@ -383,7 +383,7 @@ function UserDropdown({ small }: { small?: boolean }) {
                   </>
                 )}
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                  <DropdownMenuItem className="hidden">
                   <DropdownItem
                     StartIcon={(props) => <Slack strokeWidth={1.5} {...props} />}
                     target="_blank"
@@ -392,12 +392,12 @@ function UserDropdown({ small }: { small?: boolean }) {
                     {t("join_our_slack")}
                   </DropdownItem>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                  <DropdownMenuItem className="hidden">
                   <DropdownItem StartIcon={Map} target="_blank" href={ROADMAP}>
                     {t("visit_roadmap")}
                   </DropdownItem>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                  <DropdownMenuItem className="hidden">
                   <DropdownItem
                     type="button"
                     StartIcon={(props) => <HelpCircle aria-hidden="true" {...props} />}
@@ -405,11 +405,11 @@ function UserDropdown({ small }: { small?: boolean }) {
                     {t("help")}
                   </DropdownItem>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="desktop-hidden hidden lg:flex">
+                  <DropdownMenuItem className="hidden">
                   <DropdownItem StartIcon={Download} target="_blank" rel="noreferrer" href={DESKTOP_APP_LINK}>
                     {t("download_desktop_app")}
                   </DropdownItem>
-                </DropdownMenuItem>
+                      </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
 
@@ -622,9 +622,8 @@ const NavigationItem: React.FC<{
         className={classNames(
           "hover:bg-emphasis [&[aria-current='page']]:bg-emphasis hover:text-emphasis text-default group flex items-center rounded-md py-2 px-3 text-sm font-medium",
           isChild
-            ? `[&[aria-current='page']]:text-emphasis hidden h-8 pl-16 lg:flex lg:pl-11 [&[aria-current='page']]:bg-transparent ${
-                props.index === 0 ? "mt-0" : "mt-px"
-              }`
+            ? `[&[aria-current='page']]:text-emphasis hidden h-8 pl-16 lg:flex lg:pl-11 [&[aria-current='page']]:bg-transparent ${props.index === 0 ? "mt-0" : "mt-px"
+            }`
             : "[&[aria-current='page']]:text-emphasis mt-0.5 text-sm"
         )}
         aria-current={current ? "page" : undefined}>
@@ -780,7 +779,7 @@ function SideBar() {
         </div>
 
         <div>
-          <Tips />
+          {/*<Tips />*/}
           <div data-testid="user-dropdown-trigger">
             <span className="hidden lg:inline">
               <UserDropdown />

@@ -372,10 +372,10 @@ const ProfileForm = ({
       </div>
       {extraField}
       <div className="mt-8">
-        <TextField label={t("full_name")} {...formMethods.register("name")} />
+        <TextField label={t("full_name")} {...formMethods.register("name")} disabled />
       </div>
       <div className="mt-8">
-        <TextField label={t("email")} hint={t("change_email_hint")} {...formMethods.register("email")} />
+        <TextField label={t("email")} hint={t("change_email_hint")} {...formMethods.register("email")} disabled />
       </div>
       <div className="mt-8">
         <Label>{t("about")}</Label>
