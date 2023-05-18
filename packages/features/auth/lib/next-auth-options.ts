@@ -223,7 +223,7 @@ const providers: Provider[] = [
           // User's role is not "ADMIN"
           if (role !== "ADMIN") return role;
           // User's identity provider is not "CAL"
-          if (user.identityProvider !== IdentityProvider.CAL) return role;
+          if (user?.identityProvider !== IdentityProvider.CAL) return role;
           // User's password is valid and two-factor authentication is enabled
           if (isPasswordValid(credentials.password, false, true) && user?.twoFactorEnabled) return role;
           // Code is running in a development environment
