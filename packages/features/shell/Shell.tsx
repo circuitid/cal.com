@@ -62,10 +62,10 @@ import {
   MoreVertical,
   Settings,
   Slack,
-  Users,
   Zap,
 } from "@calcom/ui/components/icon";
 
+import FreshChatProvider from "../ee/support/lib/freshchat/FreshChatProvider";
 import { TeamInviteBadge } from "./TeamInviteBadge";
 
 // need to import without ssr to prevent hydration errors
