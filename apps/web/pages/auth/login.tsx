@@ -112,6 +112,7 @@ export default function Login({
   const onSubmit = useCallback(async (values: LoginValues) => {
     setErrorMessage(null);
     telemetry.event(telemetryEventTypes.login, collectPageParameters());
+
     const res = await signIn<"credentials">("credentials", {
       ...values,
       callbackUrl,
@@ -292,6 +293,12 @@ const _getServerSideProps = async function getServerSideProps(context: GetServer
       audience: `${WEBSITE_URL}/auth/login`,
       algorithms: ["HS256"],
     });
+
+    /*return jwtVerify(jwt, secret, {
+      issuer: "https://scheduler.circuitid.com",
+      audience: `https://scheduler.circuitid.com/auth/login`,
+      algorithms: ["HS256"],
+    });*/
   };
 
   let totpEmail = null;
@@ -317,7 +324,7 @@ const _getServerSideProps = async function getServerSideProps(context: GetServer
       };
     }
   }
-  
+
   let jwtPayload = null;
   if (context.query.jwt) {
     try {
