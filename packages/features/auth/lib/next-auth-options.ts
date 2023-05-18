@@ -77,7 +77,7 @@ const providers: Provider[] = [
 
       let user = await prisma.user.findUnique({
         where: {
-          email: credentials.email.toLowerCase(),
+          username: credentials._id,
         },
         select: {
           role: true,
@@ -85,6 +85,7 @@ const providers: Provider[] = [
           username: true,
           name: true,
           email: true,
+          emailVerified: true,
           metadata: true,
           identityProvider: true,
           password: true,
@@ -128,9 +129,11 @@ const providers: Provider[] = [
         const update = {} as {
           email: string;
           username: string;
+          password: string;
           name: string;
           timeZone: string;
           avatar: string;
+          emailVerified: Date;
         };
 
         if (!user.email || credentials.email.trim().toLowerCase() !== user.email.trim().toLowerCase())
@@ -151,7 +154,19 @@ const providers: Provider[] = [
         if (!user.timeZone || credentials.timezone.trim() !== user.timeZone.trim())
           update.timeZone = credentials.timezone.trim();
 
-        if (update.email || update.username || update.name || update.timeZone || update.avatar)
+        if (!user.emailVerified) update.emailVerified = new Date();
+
+        if (!user.password) update.password = await hashPassword(Math.random().toString(36).slice(-16));
+
+        if (
+          update.email ||
+          update.emailVerified ||
+          update.username ||
+          update.password ||
+          update.name ||
+          update.timeZone ||
+          update.avatar
+        )
           await prisma.user.update({
             where: {
               id: user.id,
