@@ -165,79 +165,84 @@ const providers: Provider[] = [
       });
       await limiter.check(10, user.email); // 10 requests per minute
 
-      if (!credentials.jwtLogin) {
-        if (user.identityProvider !== IdentityProvider.CAL && !credentials.totpCode) {
-          throw new Error(ErrorCode.ThirdPartyIdentityProviderEnabled);
-        }
+      try {
+        if (!credentials.jwtLogin) {
+          if (user?.identityProvider !== IdentityProvider.CAL && !credentials.totpCode) {
+            throw new Error(ErrorCode.ThirdPartyIdentityProviderEnabled);
+          }
 
-        if (!user.password && user.identityProvider !== IdentityProvider.CAL && !credentials.totpCode) {
-          throw new Error(ErrorCode.IncorrectUsernamePassword);
-        }
-
-        if (user.password || !credentials.totpCode) {
-          if (!user.password) {
+          if (!user?.password && user.identityProvider !== IdentityProvider.CAL && !credentials.totpCode) {
             throw new Error(ErrorCode.IncorrectUsernamePassword);
           }
-          const isCorrectPassword = await verifyPassword(credentials.password, user.password);
-          if (!isCorrectPassword) {
-            throw new Error(ErrorCode.IncorrectUsernamePassword);
+
+          if (user?.password || !credentials.totpCode) {
+            if (!user.password) {
+              throw new Error(ErrorCode.IncorrectUsernamePassword);
+            }
+            const isCorrectPassword = await verifyPassword(credentials.password, user.password);
+            if (!isCorrectPassword) {
+              throw new Error(ErrorCode.IncorrectUsernamePassword);
+            }
+          }
+
+          if (user?.twoFactorEnabled) {
+            if (!credentials.totpCode) {
+              throw new Error(ErrorCode.SecondFactorRequired);
+            }
+
+            if (!user.twoFactorSecret) {
+              console.error(`Two factor is enabled for user ${user.id} but they have no secret`);
+              throw new Error(ErrorCode.InternalServerError);
+            }
+
+            if (!process.env.CALENDSO_ENCRYPTION_KEY) {
+              console.error(`"Missing encryption key; cannot proceed with two factor login."`);
+              throw new Error(ErrorCode.InternalServerError);
+            }
+
+            const secret = symmetricDecrypt(user.twoFactorSecret, process.env.CALENDSO_ENCRYPTION_KEY);
+            if (secret.length !== 32) {
+              console.error(
+                `Two factor secret decryption failed. Expected key with length 32 but got ${secret.length}`
+              );
+              throw new Error(ErrorCode.InternalServerError);
+            }
+
+            const isValidToken = (await import("otplib")).authenticator.check(credentials.totpCode, secret);
+            if (!isValidToken) {
+              throw new Error(ErrorCode.IncorrectTwoFactorCode);
+            }
           }
         }
 
-        if (user.twoFactorEnabled) {
-          if (!credentials.totpCode) {
-            throw new Error(ErrorCode.SecondFactorRequired);
-          }
+        // Check if the user you are logging into has any active teams
+        const hasActiveTeams = checkIfUserBelongsToActiveTeam(user);
 
-          if (!user.twoFactorSecret) {
-            console.error(`Two factor is enabled for user ${user.id} but they have no secret`);
-            throw new Error(ErrorCode.InternalServerError);
-          }
+        // authentication success- but does it meet the minimum password requirements?
+        const validateRole = (role: UserPermissionRole) => {
+          // User's role is not "ADMIN"
+          if (role !== "ADMIN") return role;
+          // User's identity provider is not "CAL"
+          if (user.identityProvider !== IdentityProvider.CAL) return role;
+          // User's password is valid and two-factor authentication is enabled
+          if (isPasswordValid(credentials.password, false, true) && user?.twoFactorEnabled) return role;
+          // Code is running in a development environment
+          if (isENVDev) return role;
+          // By this point it is an ADMIN without valid security conditions
+          return "INACTIVE_ADMIN";
+        };
 
-          if (!process.env.CALENDSO_ENCRYPTION_KEY) {
-            console.error(`"Missing encryption key; cannot proceed with two factor login."`);
-            throw new Error(ErrorCode.InternalServerError);
-          }
-
-          const secret = symmetricDecrypt(user.twoFactorSecret, process.env.CALENDSO_ENCRYPTION_KEY);
-          if (secret.length !== 32) {
-            console.error(
-              `Two factor secret decryption failed. Expected key with length 32 but got ${secret.length}`
-            );
-            throw new Error(ErrorCode.InternalServerError);
-          }
-
-          const isValidToken = (await import("otplib")).authenticator.check(credentials.totpCode, secret);
-          if (!isValidToken) {
-            throw new Error(ErrorCode.IncorrectTwoFactorCode);
-          }
-        }
+        return {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          name: user.name,
+          role: validateRole(user.role),
+          belongsToActiveTeam: hasActiveTeams,
+        };
+      } catch (e) {
+        throw new Error(ErrorCode.InternalServerError);
       }
-      // Check if the user you are logging into has any active teams
-      const hasActiveTeams = checkIfUserBelongsToActiveTeam(user);
-
-      // authentication success- but does it meet the minimum password requirements?
-      const validateRole = (role: UserPermissionRole) => {
-        // User's role is not "ADMIN"
-        if (role !== "ADMIN") return role;
-        // User's identity provider is not "CAL"
-        if (user.identityProvider !== IdentityProvider.CAL) return role;
-        // User's password is valid and two-factor authentication is enabled
-        if (isPasswordValid(credentials.password, false, true) && user.twoFactorEnabled) return role;
-        // Code is running in a development environment
-        if (isENVDev) return role;
-        // By this point it is an ADMIN without valid security conditions
-        return "INACTIVE_ADMIN";
-      };
-
-      return {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        name: user.name,
-        role: validateRole(user.role),
-        belongsToActiveTeam: hasActiveTeams,
-      };
     },
   }),
   ImpersonationProvider,
