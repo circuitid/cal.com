@@ -62,6 +62,7 @@ import {
   MoreVertical,
   Settings,
   Slack,
+  Users,
   Zap,
 } from "@calcom/ui/components/icon";
 
