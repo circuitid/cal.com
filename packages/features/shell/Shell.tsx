@@ -524,7 +524,7 @@ const navigation: NavigationItemType[] = [
   {
     name: "teams",
     href: "/teams",
-    icon: FiUsers,
+    icon: Users,
     onlyDesktop: true,
     premium: true,
     badge: <TeamInviteBadge />,
