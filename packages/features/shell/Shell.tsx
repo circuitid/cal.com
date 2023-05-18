@@ -311,6 +311,13 @@ function UserDropdown({ small }: { small?: boolean }) {
                   <span className="text-emphasis mb-1 block truncate font-medium leading-none">
                     {user.name || "Nameless User"}
                   </span>
+                  <span className="text-default truncate font-normal leading-none">
+                    {user.username
+                      ? process.env.NEXT_PUBLIC_WEBSITE_URL === "https://cal.com"
+                        ? `cal.com/${user.username}`
+                        : `/${user.username}`
+                      : "No public page"}
+                  </span>
                 </span>
                 <MoreVertical
                   className="group-hover:text-subtle text-muted h-4 w-4 flex-shrink-0 ltr:mr-2 rtl:ml-2 rtl:mr-4"
@@ -447,7 +454,6 @@ export type NavigationItemType = {
     isChild?: boolean;
     router: NextRouter;
   }) => boolean;
-  premium?: boolean;
 };
 
 const requiredCredentialNavigationItems = ["Routing Forms"];
@@ -473,6 +479,13 @@ const navigation: NavigationItemType[] = [
     name: "availability",
     href: "/availability",
     icon: Clock,
+  },
+  {
+    name: "teams",
+    href: "/teams",
+    icon: Users,
+    onlyDesktop: true,
+    badge: <TeamInviteBadge />,
   },
   {
     name: "apps",
@@ -523,18 +536,9 @@ const navigation: NavigationItemType[] = [
     },
   },
   {
-    name: "teams",
-    href: "/teams",
-    icon: Users,
-    onlyDesktop: true,
-    premium: true,
-    badge: <TeamInviteBadge />,
-  },
-  {
     name: "workflows",
     href: "/workflows",
     icon: Zap,
-    premium: true,
   },
   {
     name: "insights",
@@ -580,13 +584,6 @@ const Navigation = () => {
 
 function useShouldDisplayNavigationItem(item: NavigationItemType) {
   const { status } = useSession();
-  const query = useMeQuery();
-  const user = query.data;
-
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  if (!user || (item.premium && (!user.metadata || user.metadata?.isPremium !== true))) return false;
-
   const { data: routingForms } = trpc.viewer.appById.useQuery(
     { appId: "routing-forms" },
     {
@@ -783,6 +780,7 @@ function SideBar() {
         </div>
 
         <div>
+          <Tips />
           <div data-testid="user-dropdown-trigger">
             <span className="hidden lg:inline">
               <UserDropdown />
