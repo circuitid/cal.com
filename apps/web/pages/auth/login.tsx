@@ -288,17 +288,13 @@ const _getServerSideProps = async function getServerSideProps(context: GetServer
   const verifyJwt = (jwt: string) => {
     const secret = new TextEncoder().encode(process.env.CALENDSO_ENCRYPTION_KEY);
 
+    //const WEBSITE_URL = "https://scheduler.circuitid.com";
+
     return jwtVerify(jwt, secret, {
       issuer: WEBSITE_URL,
       audience: `${WEBSITE_URL}/auth/login`,
       algorithms: ["HS256"],
     });
-
-    /*return jwtVerify(jwt, secret, {
-      issuer: "https://scheduler.circuitid.com",
-      audience: `https://scheduler.circuitid.com/auth/login`,
-      algorithms: ["HS256"],
-    });*/
   };
 
   let totpEmail = null;

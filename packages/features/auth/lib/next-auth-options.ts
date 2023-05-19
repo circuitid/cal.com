@@ -75,10 +75,23 @@ const providers: Provider[] = [
         throw new Error(ErrorCode.InternalServerError);
       }
 
+      const where = {} as {
+        username?: string;
+        email?: string;
+      };
+
+      if (credentials.jwtLogin) {
+        if (!credentials._id) throw new Error(ErrorCode.IncorrectUsernamePassword);
+
+        where.username = credentials._id.trim();
+      } else {
+        if (!credentials.email) throw new Error(ErrorCode.IncorrectUsernamePassword);
+
+        where.email = credentials.email.trim().toLowerCase();
+      }
+
       let user = await prisma.user.findUnique({
-        where: {
-          username: credentials._id,
-        },
+        where: where,
         select: {
           role: true,
           id: true,

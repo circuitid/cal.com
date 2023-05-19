@@ -798,7 +798,7 @@ function SideBar() {
 export function ShellMain(props: LayoutProps) {
   const router = useRouter();
   const { isLocaleReady } = useLocale();
-
+  
   return (
     <>
       <div
