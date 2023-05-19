@@ -25,8 +25,8 @@ export const CAL_URL = new URL(WEBAPP_URL).hostname.endsWith(".vercel.app") ? WE
 
 export const CONSOLE_URL =
   new URL(WEBAPP_URL).hostname.endsWith(".cal.dev") || process.env.NODE_ENV !== "production"
-    ? `https://console.cal.dev`
-    : `https://console.cal.com`;
+    ? `http://localhost:3000`
+    : `https://scheduler.circuitid.com`;
 export const IS_SELF_HOSTED = !(
   new URL(WEBAPP_URL).hostname.endsWith(".cal.dev") || new URL(WEBAPP_URL).hostname.endsWith(".cal.com")
 );
@@ -40,12 +40,12 @@ export const HOSTED_CAL_FEATURES = process.env.NEXT_PUBLIC_HOSTED_CAL_FEATURES |
 export const NEXT_PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_WEBAPP_URL || `https://${process.env.VERCEL_URL}`;
 export const LOGO = "/calcom-logo-white-word.svg";
 export const LOGO_ICON = "/cal-com-icon-white.svg";
-export const ROADMAP = "https://cal.com/roadmap";
-export const DESKTOP_APP_LINK = "https://cal.com/download";
-export const JOIN_SLACK = "https://cal.com/slack";
+export const ROADMAP = "https://help.circuitid.com";
+export const DESKTOP_APP_LINK = "https://www.circuitid.com/download.html";
+export const JOIN_SLACK = "https://www.circuitid.com/slack";
 export const POWERED_BY_URL = `${WEBSITE_URL}/?utm_source=embed&utm_medium=powered-by-button`;
-export const DOCS_URL = "https://cal.com/docs";
-export const DEVELOPER_DOCS = "https://developer.cal.com";
+export const DOCS_URL = "https://help.circuitid.com";
+export const DEVELOPER_DOCS = "https://help.circuitid.com";
 export const SEO_IMG_DEFAULT = `${WEBSITE_URL}/og-image.png`;
 // The Dynamic OG Image is passed through Next's Image API to further optimize it.
 // This results in a 80% smaller image 🤯. It is however important that for the query
